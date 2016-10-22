@@ -1,0 +1,12 @@
+.profile-img-card{
+    border-radius: 50%;
+   height:125px;
+   margin: 0 auto;
+   display: block;
+}
+.card-container{
+    margin: 50px auto;
+    width: 400px;
+
+}
+ 

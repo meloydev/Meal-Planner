@@ -1,5 +1,7 @@
 const {app, BrowserWindow, ipcMain} = require('electron');
 const auth = require('./auth');
+const setting = require('./settings');
+const fs = require('fs');
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -7,10 +9,10 @@ let win
 
 function createWindow() {
     // Create the browser window.
-    win = new BrowserWindow({ width: 800, height: 600 })
+    win = new BrowserWindow(setting.window);
 
     // and load the index.html of the app.
-    win.loadURL(`file://${__dirname}/login.html`)
+    win.loadURL(`file://${__dirname}/dashboard.html`)
 
     // Open the DevTools.
     //win.webContents.openDevTools();
@@ -48,8 +50,22 @@ app.on('activate', () => {
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
-ipcMain.on('async', function (event, args) {
-    win.loadURL(`file://${__dirname}/dashboard.html`);
-    //var user = auth.user();
-    //win.webContents.send('ping', user);
-})
+ipcMain.on('login', function (event, args) {
+    var user = auth.user();
+    if (user.userName === args.email &&
+        user.passWord === args.passWord) {
+        win.loadURL(`file://${__dirname}/dashboard.html`);
+    } else {
+        win.webContents.send('loginFail', user);
+    }
+});
+
+ipcMain.on('close', function (event, args) {
+    win.close();
+});
+
+ipcMain.on('navigate',(event, args)=>{
+    const path = `${__dirname}/`;
+    var partial = fs.readFileSync(path + '/partial/'+args+'.html', 'utf8');
+    win.webContents.send('reply',partial);
+});
