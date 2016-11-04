@@ -60,12 +60,35 @@ ipcMain.on('login', function (event, args) {
     }
 });
 
+
+
+ipcMain.on('navigate', (event, args) => {
+    const path = `${__dirname}/`;
+    var partial = fs.readFileSync(path + '/partial/' + args + '.html', 'utf8');
+    win.webContents.send('reply', partial);
+});
+//window functions
+ipcMain.on('tool', (event, args) => {
+    win.webContents.openDevTools();
+});
 ipcMain.on('close', function (event, args) {
     win.close();
 });
-
-ipcMain.on('navigate',(event, args)=>{
-    const path = `${__dirname}/`;
-    var partial = fs.readFileSync(path + '/partial/'+args+'.html', 'utf8');
-    win.webContents.send('reply',partial);
+ipcMain.on('min', (event, args) => { 
+    win.minimize(); 
 });
+ipcMain.on('max', (event, args) => {
+    var x = win.isMaximized();
+    if (win.isMaximized()) {
+       win.setSize(400,400);
+    } else {
+    win.maximize();
+    } 
+});
+
+ipcMain.on('meal-window', (event, args) => {
+    const path = `${__dirname}/`;
+    var partial = fs.readFileSync(path + '/partial/' + args + '.html', 'utf8');
+    win.webContents.send('meal-window-reply', partial);
+});
+ 

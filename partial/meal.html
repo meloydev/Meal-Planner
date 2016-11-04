@@ -1,61 +1,101 @@
-<div class="row">
-	<div class="col-sm-4">
-		<div id="the-basics" class="input-group">
-			<input class="typeahead form-control" type="text" placeholder="States of USA" autocomplete="off">
-			<span class="input-group-btn">
-				<button class="btn btn-default" type="button">Go!</button>
-			</span>
-		</div>
-		<!-- /input-group -->
-	</div>
-	<div class="col-sm-4"></div>
-	<div class="col-sm-4">
+<link href="css/meal.css" rel="stylesheet">
+<script src="./js/meal.js"></script>
 
+
+
+
+<!--content-->
+
+
+<div class="meal-container">
+	<table>
+		<thead>
+			<tr>
+				<td>Food/Supplement</td>
+				<td>Category</td>
+				<td>Calories</td>
+				<td>Fat, g</td>
+				<td>Carbs, g</td>
+				<td>Protein, g</td>
+			</tr>
+		</thead>
+	</table>
+	<hr/>
+<h3>Meal 1</h3>
+	<table>
+		<tbody>
+			<tr>
+				<td>Bacon</td>
+				<td>Breakfast</td>
+				<td>100</td>
+				<td>.25</td>
+				<td>.50</td>
+				<td>.55</td>
+			</tr>
+			<tr>
+				<td>Eggs</td>
+				<td>Breakfast</td>
+				<td>200</td>
+				<td>.50</td>
+				<td>.30</td>
+				<td>.66</td>
+			</tr>
+		</tbody>
+	</table>
+	<h3>Meal 2</h3>
+	<table>
+		<tbody>
+			<tr>
+				<td>Bacon</td>
+				<td>Breakfast</td>
+				<td>100</td>
+				<td>.25</td>
+				<td>.50</td>
+				<td>.55</td>
+			</tr>
+			<tr>
+				<td>Eggs</td>
+				<td>Breakfast</td>
+				<td>200</td>
+				<td>.50</td>
+				<td>.30</td>
+				<td>.66</td>
+			</tr>
+		</tbody>
+	</table>
+	<div class="meal-total">
+		<hr/>
+		<table>
+			<tbody>
+				<tr>
+					<td>Totals:</td>
+					<td></td>
+					<td>100</td>
+					<td>.25</td>
+					<td>.50</td>
+					<td>.55</td>
+				</tr>
+			</tbody>
+		</table>
 	</div>
 </div>
-<!-- /.row -->
-<script>
-	var substringMatcher = function(strs) {
-  return function findMatches(q, cb) {
-    var matches, substringRegex;
 
-    // an array that will be populated with substring matches
-    matches = [];
 
-    // regex used to determine if a string contains the substring `q`
-    substrRegex = new RegExp(q, 'i');
 
-    // iterate through the pool of strings and for any string that
-    // contains the substring `q`, add it to the `matches` array
-    $.each(strs, function(i, str) {
-      if (substrRegex.test(str)) {
-        matches.push(str);
-      }
-    });
+<!--actions-->
+<div class="base setting">
+	<div class="top-right circle sm">
+		<a id="btnPrint" class="fa fa-print"></a>
+	</div>
+	<div class="top-left circle sm">
+		<a class="fa fa-envelope"></a>
+	</div>
+	<div data-location="foodAdd" class="bottom-left circle sm">
+		<a data-location="foodAdd" id="btnAdd" class="fa fa-plus"></a>
+	</div>
+	<div class="bottom-right circle md">
+		<a class="fa fa-gears fa-2x"></a>
+	</div>
+</div>
 
-    cb(matches);
-  };
-};
 
-var states = ['Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California',
-  'Colorado', 'Connecticut', 'Delaware', 'Florida', 'Georgia', 'Hawaii',
-  'Idaho', 'Illinois', 'Indiana', 'Iowa', 'Kansas', 'Kentucky', 'Louisiana',
-  'Maine', 'Maryland', 'Massachusetts', 'Michigan', 'Minnesota',
-  'Mississippi', 'Missouri', 'Montana', 'Nebraska', 'Nevada', 'New Hampshire',
-  'New Jersey', 'New Mexico', 'New York', 'North Carolina', 'North Dakota',
-  'Ohio', 'Oklahoma', 'Oregon', 'Pennsylvania', 'Rhode Island',
-  'South Carolina', 'South Dakota', 'Tennessee', 'Texas', 'Utah', 'Vermont',
-  'Virginia', 'Washington', 'West Virginia', 'Wisconsin', 'Wyoming'
-];
-
-$('#the-basics .typeahead').typeahead({
-  hint: true,
-  highlight: true,
-  minLength: 1
-},
-{
-  name: 'states',
-  source: substringMatcher(states)
-});
-
-</script>
