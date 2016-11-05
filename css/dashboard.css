@@ -2,6 +2,8 @@ html,
 body {
     height: 100%;
     background-color:#fff;
+    overflow: hidden;
+    -webkit-user-select: none;
 }
 i{
     cursor: pointer;
@@ -9,14 +11,28 @@ i{
 }
 a{
   color:#fff;
+  text-decoration: none !important;
+}
+p{
+  color:#757575;
 }
 .header{
     background-color: #00BCD4;
     box-shadow: 0 2px 6px rgba(0,0,0,0.2);
     width:100%;
-    height: 30%;
+    height: 35vh;
     min-height: 200px;
     color:#fff;
+    position:relative;
+}
+
+.partial-container{
+  background-color: #fff;
+  position: relative;
+  top:-100px;
+  height: 70vh;
+  box-shadow: 0 3px 13px rgba(0,0,0,0.23),0 3px 10px rgba(0,0,0,0.16); 
+  overflow: hidden;
 }
 
 .window-control{
@@ -90,4 +106,53 @@ a{
   right:0;
   background-color:#FFC107;
   transform: rotate(-45deg);
+}
+.dashboard-links-container{
+  position:absolute;
+  bottom:0;
+  text-align:center;
+  width:100%;
+}
+.dashboard-links-container h3{
+  display: inline-block;
+  cursor: pointer; 
+}
+
+.center-logo{
+  margin: 0 auto; 
+  width: 38vw;
+  max-width: 350px;
+  margin-top: 5vh;
+}
+
+.slide { 
+    position: relative;  
+    margin: 0 5vw 2vh; 
+    transition: 1s;
+}
+ 
+.slide:after {
+    content: '';
+    display: block;
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    height: 3px;
+    width: 0;
+    background: transparent;
+    transition: width .5s ease, background-color .5s ease;
+}
+ 
+.slide:hover:after {
+    width: 100%;
+    background: #fff;
+}
+
+
+
+
+
+/*partial dashboard*/
+.center-quote{
+  
 }

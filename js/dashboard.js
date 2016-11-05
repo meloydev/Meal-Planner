@@ -9,12 +9,15 @@ $(document).ready(function () {
     $('.fa-window-minimize').click(click.minimize);
     $('.fa-window-maximize').click(click.maximize);
     $('.fa-window-close-o').click(click.close);
+    $('#btnHome').click(click.home);
 })
 
 var click = {
     navigate: function () {
         var loc = $(this).data('location');
-        ipcRenderer.send('navigate', loc);
+        $('.dashboard-links-container').fadeOut('slow', function () {
+            ipcRenderer.send('navigate', loc);
+        }); 
     },
     tool: function () {
         ipcRenderer.send('tool');
@@ -27,6 +30,10 @@ var click = {
     },
     maximize: function () {
         ipcRenderer.send('max');
+    },
+    home:function () {
+         ipcRenderer.send('navigate', 'dashboard');
+          $('.dashboard-links-container').delay(600).fadeIn('slow'); 
     }
 };
 

@@ -10,10 +10,13 @@ $(document).ready(function () {
 
 var click = {
   print: function () {
-    debugger;
+    $('.base').toggleClass("base-expand");
+    $('.top-left').toggleClass("middle-fix");
     window.print();
   },
   addFood: function () {
+    $('.base').toggleClass("base-expand");
+    $('.top-left').toggleClass("middle-fix");
     var loc = $(this).data('location');
     ipcRenderer.send('meal-window', loc);
   }
@@ -30,7 +33,7 @@ ipcRenderer.on('meal-window-reply', (event, arg) => {
   //clean it out
   popupBody.empty();
   //add the body to the modal
-  contents.appendTo(popupBody); 
- //show modal
+  contents.appendTo(popupBody);
+  //show modal
   popUp.modal();
 });

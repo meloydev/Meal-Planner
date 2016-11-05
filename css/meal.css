@@ -11,6 +11,9 @@ hr{
   margin: 0 auto;
   border: 1px solid #BDBDBD;
 }
+h3{
+  color:#212121;
+}
 .setting{
   position:fixed;
   bottom:25px;
@@ -75,7 +78,7 @@ hr{
   position:absolute;
   bottom:0;
   right:0;
-  background-color:#FFC107;
+  background-color:#FFEB3B;
 }
 .middle-fix{
    margin:15px;
@@ -87,6 +90,7 @@ hr{
   top:-100px;
   height: 70vh;
   box-shadow: 0 3px 13px rgba(0,0,0,0.23),0 3px 10px rgba(0,0,0,0.16); 
+  overflow: hidden;
 }
 .meal-container table{
   width: 90%;
@@ -107,6 +111,7 @@ td{
 }
 .meal-container table tbody tr td{
  text-align: left;
+ padding-left: 30px;
 }
 .meal-container table tr td:nth-child(n+2){ 
  width: 14%;
@@ -116,14 +121,35 @@ td{
  text-align: right; 
  padding-right: 10px;
 }
-
+.btn-circle{
+  cursor: pointer;
+}
+.table-scroll{
+  height:85%;
+  overflow: auto;
+}
 .meal-total{
   position: absolute;
   bottom: 0;
   width: 100%; 
+  background-color: #fff;
+   box-shadow: 0 -14px 25px #fff; 
 }
 
+   .logo{
+     height:350px; 
+     position: absolute;
+     bottom: 30vh;
+     left:035vw;
+     z-index: 2;
+     opacity: .3;
+     display: none;
+   }
+
 @media print{
+  .header{
+    display: none;
+  }
   .base{
     display: none;
   }
@@ -136,5 +162,8 @@ td{
     left:0;
     width: 8.5in;
     height: 11in;
+   } 
+    .logo{ 
+     display: inline;
    }
 }

@@ -13,12 +13,12 @@
 	</script>
 	<script src="./js/bootstrap.js"></script>
 	<script src="./js/dashboard.js"></script>
-	<script src="./js/typeahead.js"></script>
 </head>
 <body>
 	<div class="header">
 		<span class="tools">
-			<i class="fa fa-wrench" aria-hidden="true"></i>
+			<!--<i class="fa fa-wrench" aria-hidden="true"></i>-->
+			<i id=btnHome class="fa fa-home fa-2x" aria-hidden="true"></i>
 		</span>
 		<span class="window-control">
 			<i class="fa fa-arrows" style="-webkit-app-region: drag" aria-hidden="true"></i>
@@ -27,24 +27,22 @@
 			<i class="fa fa-window-close-o" aria-hidden="true"></i>
 		</span>
 
+		<!--nav-->
+
+		<div class="dashboard-links-container">
+			<h3 data-location="measure" id="btnMeasure" class="dashboad-link slide">Measurements</h3>
+			<h3 data-location="meal" id="btnMeal" class="dashboad-links slide">Meal Planner</h3>
+			<h3 data-location="clientAdd" id="btnAddClient" class="dashboad-links slide">Users</h3>
+			<h3 data-location="Setting" id="btnSetting" class="dashboad-links slide">Settings</h3>
+		</div>
+
 	</div>
 	<div>
 
 	</div>
 	<div class="container" id="mainContent">
-		<div class="menu-base">
-			<div data-location="clientAdd" id="btnAddClient" class="top-right circle md">
-				<a class="fa fa-user-o"></a>
-			</div>
-			<div data-location="meal" id="btnMeal" class="top-left circle md">
-				<a class="fa fa-spoon"></a>
-			</div>
-			<div data-location="measure" id="btnMeasure" class="bottom-left circle md">
-				<a class="fa fa-balance-scale"></a>
-			</div>
-			<div class="bottom-right circle md">
-				<a class="fa fa-gears"></a>
-			</div>
+		<div class="center-logo">
+			<img src="./asset/tbf-350X350.png" alt="tbf logo" class="img-responsive">
 		</div>
 	</div>
 
@@ -59,13 +57,8 @@
 					<h4 class="modal-title">Add Food</h4>
 				</div>
 				<div class="modal-body">
-					body goes here
 
 				</div>
-				<!--<div class="modal-footer">
-					<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-					<button type="button" class="btn btn-primary">Save changes</button>
-				</div>-->
 			</div>
 			<!-- /.modal-content -->
 		</div>
