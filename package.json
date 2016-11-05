@@ -11,5 +11,16 @@
   "dependencies": {
     "electron": "^1.4.3",
     "jquery": "^3.1.1"
+  },
+  "repository": { 
+      "name": "TBF Meal Planner",
+      "description": "Gym software",
+      "author": "Mike Meloy",
+      "version": "1.0.0",
+      "main": "https://github.com/meloydev/Meal-Planner.git",
+      "dependencies": {
+      
+      }
+    }
   }
-}
+ 
