@@ -1,11 +1,7 @@
 $(document).ready(function () {
-  $('.bottom-right').click(function () {
-    $('.base').toggleClass("base-expand");
-    //padding for that middle button
-    $('.top-left').toggleClass("middle-fix");
-  });
-  $('#btnPrint').click(click.print);
-  $('#btnAdd').click(click.addFood);
+  $('.bottom-right').off('click').click(click.buttonExpand);
+  $('#btnPrint').off('click').click(click.print);
+  $('#btnAdd').off('click').click(click.addFood); 
 });
 
 var click = {
@@ -14,11 +10,16 @@ var click = {
     $('.top-left').toggleClass("middle-fix");
     window.print();
   },
-  addFood: function () {
+  addFood: function () { 
     $('.base').toggleClass("base-expand");
     $('.top-left').toggleClass("middle-fix");
     var loc = $(this).data('location');
     ipcRenderer.send('meal-window', loc);
+  },
+  buttonExpand:function () {
+      $('.base').toggleClass("base-expand");
+    //padding for that middle button
+    $('.top-left').toggleClass("middle-fix");
   }
 };
 

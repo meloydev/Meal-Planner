@@ -87,8 +87,8 @@ h3{
 .meal-container{
   background-color: #fff;
   position: relative;
-  top:-100px;
-  height: 70vh;
+  top:-20vh;
+  height: 75vh;
   box-shadow: 0 3px 13px rgba(0,0,0,0.23),0 3px 10px rgba(0,0,0,0.16); 
   overflow: hidden;
 }
@@ -120,6 +120,9 @@ td{
 .meal-container table tbody tr td:nth-child(n+3){
  text-align: right; 
  padding-right: 10px;
+}
+.meal-empty{
+  display: none;
 }
 .btn-circle{
   cursor: pointer;

@@ -1,5 +1,5 @@
 $(document).ready(function () {
-    $("#btnAddFood").click(actions.addItem);
+    $("#btnAddFood").off('click').click(actions.addItem);
 });
 
 var actions = {
@@ -9,18 +9,20 @@ var actions = {
         var multiplier = $('#txtMulti').val();
         //add item to specific grid 
         grid.addRow(item.data(), meal, multiplier);
+        //remove had class if neccessary
+        grid.unhideMeal(meal);
     }
 };
 
 var grid = {
     addRow: function (a, b, c) {
         //get table body to append a new row
-        var table= $('#tbl' + b + ' > tbody:last-child');
+        var table = $('#tbl' + b + ' > tbody:last-child');
         //create row from dropdown selection
         var row = grid.generateRow(a);
         //fade in for effect
         row.hide().appendTo(table).fadeIn(1000);
- 
+
         //get totals
         var allCal = $('.cal');
         var allFat = $('.fat');
@@ -30,7 +32,7 @@ var grid = {
         grid.updateTotal(allProtein, 'lblProtein');
         grid.updateTotal(allFat, 'lblFat');
         grid.updateTotal(allCarb, 'lblCarb');
-        grid.updateTotal(allCal, 'lblCal'); 
+        grid.updateTotal(allCal, 'lblCal');
     },
     generateRow: function (data) {
         var row = $tr = $('<tr>').append(
@@ -52,5 +54,10 @@ var grid = {
         }
         var roundedTotal = Math.round(tot * 100) / 100;
         $('#' + ele).html(roundedTotal);
+    },
+    unhideMeal: function (e) {
+        //remove class hiding meal[i]
+        var tbl = $('#meal' + e); 
+        tbl.removeClass('meal-empty');
     }
 };
