@@ -1,11 +1,24 @@
-.profile-img-card{
-    border-radius: 50%;
-   height:125px;
-   margin: 0 auto;
-   display: block;
+.header{
+    height: 100vh;
+     transition: 1s;
 }
-.card-container{
-    margin: 20vh auto;
-    width: 400px; 
+.partial-container{
+    top:-85vh;
+    transition: 1s;
+}
+.login-control{
+   width: 50%;
+   margin: 0 auto;
+   top:10vh;
+   position: relative;
 }
  
+.window-control{
+    display: none;
+} 
+.tools{
+    display: none;
+} 
+.dashboard-links-container{
+    display: none;
+}

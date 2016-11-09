@@ -10,6 +10,9 @@ $(document).ready(function () {
     $('.fa-window-maximize').click(click.maximize);
     $('.fa-window-close-o').click(click.close);
     $('#btnHome').click(click.home);
+    //this gets initial partial to display
+    console.log('ready');
+    ipcRenderer.send('setting', 'Require Login'); 
 })
 
 var click = {
@@ -17,7 +20,7 @@ var click = {
         var loc = $(this).data('location');
         $('.dashboard-links-container').fadeOut('slow', function () {
             ipcRenderer.send('navigate', loc);
-        }); 
+        });
     },
     tool: function () {
         ipcRenderer.send('tool');
@@ -31,9 +34,9 @@ var click = {
     maximize: function () {
         ipcRenderer.send('max');
     },
-    home:function () {
-         ipcRenderer.send('navigate', 'dashboard');
-          $('.dashboard-links-container').delay(600).fadeIn('slow'); 
+    home: function () {
+        ipcRenderer.send('navigate', 'dashboard');
+        $('.dashboard-links-container').delay(600).fadeIn('slow');
     }
 };
 
@@ -46,4 +49,17 @@ ipcRenderer.on('reply', (event, arg) => {
         container.fadeIn(300);
     });
 });
+
+//this is waiting for a settings value to be returned
+//from the main process, might have to change this up
+//to deal with multiple settings returned??
+ipcRenderer.on('setting', (event, arg) => {
+     console.log('Settings callback -- Location dashboard.js -- setting: '+arg.label);
+    if (arg.value) { 
+        ipcRenderer.send('navigate', 'login');
+    } else {
+        ipcRenderer.send('navigate', 'dashboard');
+    }
+});
+
 

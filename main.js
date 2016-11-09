@@ -2,6 +2,12 @@ const {app, BrowserWindow, ipcMain} = require('electron');
 const auth = require('./auth');
 const setting = require('./settings');
 const fs = require('fs');
+const path = `${__dirname}/`;
+
+//database stuff
+var Datastore = require('nedb');
+var db = new Datastore({ filename: __dirname + '/setting.db', autoload: true });
+var dbAdmin = new Datastore({ filename: __dirname + '/admin.db', autoload: true });
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -10,13 +16,10 @@ let win
 function createWindow() {
     // Create the browser window.
     win = new BrowserWindow(setting.window);
-
     // and load the index.html of the app.
-    win.loadURL(`file://${__dirname}/login.html`)
-
+    win.loadURL(`file://${__dirname}/dashboard.html`)
     // Open the DevTools.
-    //win.webContents.openDevTools();
-
+    //win.webContents.openDevTools(); 
     // Emitted when the window is closed.
     win.on('closed', () => {
         // Dereference the window object, usually you would store windows
@@ -54,19 +57,22 @@ app.on('activate', () => {
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
 ipcMain.on('login', function (event, args) {
-    var user = auth.user();
-    if (user.userName === args.email &&
-        user.passWord === args.passWord) {
-        win.loadURL(`file://${__dirname}/dashboard.html`);
-    } else {
-        win.webContents.send('loginFail', user);
-    }
+    dbAdmin.findOne({ userName: args.userName }, function (err, user) { 
+        if (user !== null && user.userName === args.userName &&
+            user.passWord === args.passWord) {
+            var partial = fs.readFileSync(path + '/partial/dashboard.html', 'utf8');
+            win.webContents.send('reply', partial);
+        } else {
+            //TODO..
+        }
+    });
+
 });
 
 
-
+//These calls are from controls 
+//located on pages
 ipcMain.on('navigate', (event, args) => {
-    const path = `${__dirname}/`;
     var partial = fs.readFileSync(path + '/partial/' + args + '.html', 'utf8');
     win.webContents.send('reply', partial);
 });
@@ -77,21 +83,26 @@ ipcMain.on('tool', (event, args) => {
 ipcMain.on('close', function (event, args) {
     win.close();
 });
-ipcMain.on('min', (event, args) => { 
-    win.minimize(); 
+ipcMain.on('min', (event, args) => {
+    win.minimize();
 });
 ipcMain.on('max', (event, args) => {
     var x = win.isMaximized();
     if (win.isMaximized()) {
-       win.setSize(400,400);
+        win.setSize(400, 400);
     } else {
-    win.maximize();
-    } 
+        win.maximize();
+    }
 });
 
 ipcMain.on('meal-window', (event, args) => {
-    const path = `${__dirname}/`;
     var partial = fs.readFileSync(path + '/partial/' + args + '.html', 'utf8');
     win.webContents.send('meal-window-reply', partial);
 });
- 
+//these calls are to query the db
+ipcMain.on('setting', (event, args) => {
+    db.findOne({ label: args }, function (err, doc) {
+        win.webContents.send('setting', doc);
+    });
+});
+

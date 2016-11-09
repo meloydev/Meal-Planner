@@ -24,13 +24,14 @@ p{
     min-height: 200px;
     color:#fff;
     position:relative;
+    transition: 1s;
 }
 
 .partial-container{
   background-color: #fff;
   position: relative;
-  top:-100px;
-  height: 70vh;
+  top:-20vh;
+  height: 75vh;
   box-shadow: 0 3px 13px rgba(0,0,0,0.23),0 3px 10px rgba(0,0,0,0.16); 
   overflow: hidden;
 }
@@ -154,6 +155,8 @@ p{
 
 /*partial dashboard*/
 .center-quote{
-  font-size: 3em;
-  margin: 14vh 3vw;
+  font-size: 2em;
+  margin: 14vh 0;
+  text-align: center;
 }
+

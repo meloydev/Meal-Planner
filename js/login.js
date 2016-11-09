@@ -1,18 +1,14 @@
-const electron = require('electron');
-//const $ = require('jQuery');
-const {ipcRenderer} = electron;
-
-$(document).ready(function () { 
+  
+$(document).ready(function () {  
     var c = $('#btnSubmit');
     c.click(() => {
-        var userName = $('#inputEmail').val();
-        var passWord = $('#inputPassword').val();
-        ipcRenderer.send('login', { email: userName, passWord: passWord });
+        var name = $('#txtUserName').val();
+        var pass = $('#txtPassWord').val();
+        ipcRenderer.send('login', { userName: name, passWord: pass });
     });
 });
 
 //this is a callback from main window
 ipcRenderer.on('loginFail', (event, arg) => { 
-  var moda= $("#myModal");
-  moda.modal();
+  debugger;
 });
