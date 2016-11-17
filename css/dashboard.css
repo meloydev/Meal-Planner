@@ -30,8 +30,8 @@ p{
 .partial-container{
   background-color: #fff;
   position: relative;
-  top:-20vh;
-  height: 75vh;
+  top:-30vh;
+  height: 90vh;
   box-shadow: 0 3px 13px rgba(0,0,0,0.23),0 3px 10px rgba(0,0,0,0.16); 
   overflow: hidden;
 }
@@ -159,4 +159,12 @@ p{
   margin: 14vh 0;
   text-align: center;
 }
+
+/*Auto complete*/
+.autocomplete-suggestions { border: 1px solid #999; background: #FFF; overflow: auto; }
+.autocomplete-suggestion { padding: 2px 5px; white-space: nowrap; overflow: hidden; }
+.autocomplete-selected { background: #F0F0F0; }
+.autocomplete-suggestions strong { font-weight: normal; color: #3399FF; }
+.autocomplete-group { padding: 2px 5px; }
+.autocomplete-group strong { display: block; border-bottom: 1px solid #000; }
 

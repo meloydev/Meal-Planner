@@ -87,8 +87,8 @@ h3{
 .meal-container{
   background-color: #fff;
   position: relative;
-  top:-20vh;
-  height: 75vh;
+  top:-30vh;
+  height: 90vh;
   box-shadow: 0 3px 13px rgba(0,0,0,0.23),0 3px 10px rgba(0,0,0,0.16); 
   overflow: hidden;
 }

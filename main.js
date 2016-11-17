@@ -8,6 +8,7 @@ const path = `${__dirname}/`;
 var Datastore = require('nedb');
 var db = new Datastore({ filename: __dirname + '/setting.db', autoload: true });
 var dbAdmin = new Datastore({ filename: __dirname + '/admin.db', autoload: true });
+var dbFood = new Datastore({ filename: __dirname + '/food.db', autoload: true });
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -51,13 +52,10 @@ app.on('activate', () => {
     }
 })
 
-
-
-
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
 ipcMain.on('login', function (event, args) {
-    dbAdmin.findOne({ userName: args.userName }, function (err, user) { 
+    dbAdmin.findOne({ userName: args.userName }, function (err, user) {
         if (user !== null && user.userName === args.userName &&
             user.passWord === args.passWord) {
             var partial = fs.readFileSync(path + '/partial/dashboard.html', 'utf8');
@@ -68,7 +66,6 @@ ipcMain.on('login', function (event, args) {
     });
 
 });
-
 
 //These calls are from controls 
 //located on pages
@@ -94,10 +91,16 @@ ipcMain.on('max', (event, args) => {
         win.maximize();
     }
 });
-
 ipcMain.on('meal-window', (event, args) => {
     var partial = fs.readFileSync(path + '/partial/' + args + '.html', 'utf8');
     win.webContents.send('meal-window-reply', partial);
+});
+//admin page
+ipcMain.on('add-food', (event, args) => {
+    dbFood.insert(args, function (err, doc) {
+        console.log('Inserted', doc.name, 'with ID', doc._id);
+        win.webContents.send('meal-add-reply', doc.name + ' added successfully!');
+    });
 });
 //these calls are to query the db
 ipcMain.on('setting', (event, args) => {
@@ -105,4 +108,16 @@ ipcMain.on('setting', (event, args) => {
         win.webContents.send('setting', doc);
     });
 });
+ipcMain.on('autocomplete-food-search', (event, args) => {
+    dbFood.find({}, function (err, doc) {
+        win.webContents.send('food-search-result', doc);
+    });
+});
+ipcMain.on('food-search-byId', (event, args) => {
+    dbFood.findOne({'_id': args}, function (err, doc) {
+        win.webContents.send('food-search-byId-result', doc);
+    });
+});
+
+
 
