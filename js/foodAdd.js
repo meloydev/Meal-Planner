@@ -4,18 +4,31 @@ $(document).ready(function () {
         lookup: autocomplete.lookup,
         onSelect: autocomplete.onSelect
     });
+    var el = $('#txtAutoComplete');
+    var options = {
+        template: '<div class="popover" role="tooltip" style="width: 200px;"><div class="arrow"></div><h3 class="popover-title"></h3><div class="popover-content"><div class="data-content"></div></div></div>',
+        html: true,
+        placement: 'right',
+        title: 'Nutient Values',
+        trigger: 'manual'
+    };
+    el.popover(options);
 });
 
 //for now, setting a global object
 var callback = {
-    done: function () { 
+    done: function (result) {
+
     }
 };
 
 var actions = {
-    addItem: function (item) {  
+    addItem: function () {
+        var item = JSON.parse(localStorage.getItem('food-item'));
         var meal = $('#ddlMealNumber').val();
-        var multiplier = $('#txtMulti').val();
+        var userSelectedValue = parseInt($('#txtMulti').val());
+        //if not a number or less than 1, return 1
+        var multiplier = !isNaN(userSelectedValue) && userSelectedValue > 0 ? userSelectedValue : 1; 
         //add item to specific grid 
         grid.addRow(item, meal, multiplier);
         //remove had class if neccessary
@@ -28,7 +41,7 @@ var grid = {
         //get table body to append a new row
         var table = $('#tbl' + b + ' > tbody:last-child');
         //create row from dropdown selection
-        var row = grid.generateRow(a);
+        var row = grid.generateRow(a, c);
         //fade in for effect
         row.hide().appendTo(table).fadeIn(1000);
 
@@ -47,14 +60,14 @@ var grid = {
         grid.updateMacro(allCarb, 4, allCal, 'lblMacroCarb');
         grid.updateMacro(allProtein, 4, allCal, 'lblMacroPro');
     },
-    generateRow: function (data) {
-        var row = $tr = $('<tr>').append(
+    generateRow: function (data, multiplier) {
+        var row = $('<tr>').append(
             $('<td>').text(data.name),
             $('<td>').text(data.category),
-            $('<td class="cal">').text(data.calories),
-            $('<td class="fat">').text(data.fat),
-            $('<td class="carb">').text(data.carbs),
-            $('<td class="pro">').text(data.protein)
+            $('<td class="cal">').text(data.calories * multiplier),
+            $('<td class="fat">').text(data.fat * multiplier),
+            $('<td class="carb">').text(data.carb * multiplier),
+            $('<td class="pro">').text(data.protein * multiplier)
         );
         return row;
     },
@@ -104,15 +117,39 @@ var autocomplete = {
         callback.done = done; //put callback in global to call in response
         ipcRenderer.send('autocomplete-food-search', query);
     },
-    onSelect: function (selected) { 
-         ipcRenderer.send('food-search-byId', selected.data);
+    onSelect: function (selected) {
+        ipcRenderer.send('food-search-byId', selected.data);
     }
 }
 
-
+//so listeners are only added once.
+ipcRenderer.removeAllListeners('food-search-byId-result');
+ipcRenderer.removeAllListeners('food-search-result');
 //page events returns
-ipcRenderer.on('food-search-byId-result', (event, foodItem) => { 
-    actions.addItem(foodItem);
+ipcRenderer.on('food-search-byId-result', (event, foodItem) => {
+    localStorage.setItem('food-item', JSON.stringify(foodItem));
+    var el = $('#txtAutoComplete');
+
+    var tbl = $(document.createElement("TABLE"));
+    tbl.addClass('meal-popout');
+    tbl.append($('<tr>').append(
+        $('<td>').text('Protein'),
+        $('<td>').text(foodItem.protein))); 
+    tbl.append($('<tr>').append(
+        $('<td>').text('Fat'),
+        $('<td>').text(foodItem.fat))); 
+    tbl.append($('<tr>').append(
+        $('<td>').text('Calories'),
+        $('<td>').text(foodItem.calories))); 
+    tbl.append($('<tr>').append(
+        $('<td>').text('Carbs'),
+        $('<td>').text(foodItem.carb)));
+ 
+    el.popover('show');
+    $('.popover-content').append(tbl);
+    // setTimeout(function () {
+    //     el.popover('hide');
+    // }, 5000);
 })
 //return for autocomplete server request
 ipcRenderer.on('food-search-result', (event, foodItems) => {

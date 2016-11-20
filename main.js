@@ -108,11 +108,14 @@ ipcMain.on('setting', (event, args) => {
         win.webContents.send('setting', doc);
     });
 });
-ipcMain.on('autocomplete-food-search', (event, args) => {
-    dbFood.find({}, function (err, doc) {
+//searches by food that contains char in args
+ipcMain.on('autocomplete-food-search', (event, args) => { 
+    var re = new RegExp(args,'i'); 
+    dbFood.find({name : re}, function (err, doc) {
         win.webContents.send('food-search-result', doc);
     });
 });
+//returns one food item based on ID
 ipcMain.on('food-search-byId', (event, args) => {
     dbFood.findOne({'_id': args}, function (err, doc) {
         win.webContents.send('food-search-byId-result', doc);

@@ -121,14 +121,20 @@ td{
  text-align: right; 
  padding-right: 10px;
 }
+.meal{
+  visibility: visible;
+  opacity: 1;
+  transition: visibility 0s, opacity 1s linear;
+}
 .meal-empty{
-  display: none;
+  visibility: hidden;
+  opacity: 0; 
 }
 .btn-circle{
   cursor: pointer;
 }
 .table-scroll{
-  height:85%;
+  height:90%;
   overflow: auto;
 }
 .meal-total{
@@ -147,6 +153,19 @@ td{
      z-index: 2;
      opacity: .3;
      display: none;
+   }
+
+   .meal-popout{
+    width: 75%;
+    margin: 0 auto;
+    border-collapse: separate;
+    border-spacing: 4px;
+   }
+   .meal-popout td{
+      text-align: left; 
+   }
+   .meal-popout td:nth-child(2){
+    text-align: right;
    }
 
 @media print{

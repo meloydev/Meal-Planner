@@ -5,21 +5,11 @@
 	<div class="form-group">
 		<label for="food">Food/Supplement</label>
 		<input class="form-control" type="text" name="food" id="txtAutoComplete">
-		<!--<select class="form-control" id="ddlFood" placeholder="Select One">
-			<option disabled selected value>Select One</option>
-			<option data-name="Bacon" data-category="Fat" data-calories="27" data-fat="2.09" data-carbs=".07" data-protein="1.85" value="1001">Bacon</option> 
-			<option data-name="Eggs" data-category="Protein" data-calories="50" data-fat=".25" data-carbs=".45" data-protein="5" value="1002">Eggs</option>
-			<option data-name="Hash Browns" data-category="Carb" data-calories="413" data-fat="19.5" data-carbs="54.8" data-protein="4.7" value="1003">Hash Browns</option>
-			<option data-name="Toast" data-category="Carb" data-calories="75" data-fat=".55" data-carbs=".85" data-protein=".05" value="1004">Toast</option>
-			<option data-name="Turkey" data-category="Protein" data-calories="25" data-fat=".25" data-carbs="0" data-protein="2" value="1005">Turkey</option>
-			<option data-name="Salmon" data-category="Protein" data-calories="100" data-fat=".85" data-carbs="0" data-protein="1.5" value="1006">Salmon</option>
-		</select>-->
 	</div>
 	<div class="form-group">
 		<label for="">Meal</label>
 		<select class="form-control" id="ddlMealNumber" placeholder="Select One">
-			<option disabled selected value>Select One</option>
-			<option value="One">1</option>
+			<option value="One" seleted>1</option>
 			<option value="Two">2</option>
 			<option value="Three">3</option>
 			<option value="Four">4</option>
@@ -28,8 +18,8 @@
 		</select>
 	</div>
 	<div class="form-group">
-		<label for="">Multiplier</label>
-		<input type="number" class="form-control" id="txtMulti" placeholder="Enter Calories">
-	</div> 
+		<label for="">How many servings?</label>
+		<input type="number" class="form-control" id="txtMulti" placeholder="Leaving blank will default to one serving">
+	</div>
 	<button id="btnAddFood" type="button" class="btn btn-primary">Add</button>
 </form>
