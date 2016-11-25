@@ -103,21 +103,28 @@ ipcMain.on('add-food', (event, args) => {
     });
 });
 //these calls are to query the db
-ipcMain.on('setting', (event, args) => {
+ipcMain.on('find-setting', (event, args) => {
     db.findOne({ label: args }, function (err, doc) {
-        win.webContents.send('setting', doc);
+        win.webContents.send('return-setting', doc);
+    });
+});
+ipcMain.on('update-setting', (event, args) => {
+    var settingLabel = args.label;
+    var newValue = args.updatedValue;
+    db.update({ label: settingLabel }, { $set: { value: newValue } }, function (err, doc) {
+        console.log('Updated setting');
     });
 });
 //searches by food that contains char in args
-ipcMain.on('autocomplete-food-search', (event, args) => { 
-    var re = new RegExp(args,'i'); 
-    dbFood.find({name : re}, function (err, doc) {
+ipcMain.on('autocomplete-food-search', (event, args) => {
+    var re = new RegExp(args, 'i');
+    dbFood.find({ name: re }, function (err, doc) {
         win.webContents.send('food-search-result', doc);
     });
 });
 //returns one food item based on ID
 ipcMain.on('food-search-byId', (event, args) => {
-    dbFood.findOne({'_id': args}, function (err, doc) {
+    dbFood.findOne({ '_id': args }, function (err, doc) {
         win.webContents.send('food-search-byId-result', doc);
     });
 });

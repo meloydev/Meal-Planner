@@ -11,7 +11,7 @@ $(document).ready(function () {
     $('.fa-window-close-o').click(click.close);
     $('#btnHome').click(click.home);
     //this gets initial partial to display 
-    ipcRenderer.send('setting', 'Require Login');
+    ipcRenderer.send('find-setting', 'Require Login');
 })
 var utilities = {
     notify: function (messageOptions) {
@@ -73,7 +73,7 @@ ipcRenderer.on('reply', (event, arg) => {
 //this is waiting for a settings value to be returned
 //from the main process, might have to change this up
 //to deal with multiple settings returned??
-ipcRenderer.on('setting', (event, arg) => {
+ipcRenderer.on('return-setting', (event, arg) => {
     console.log('Settings callback -- Location dashboard.js -- setting: ' + arg.label);
     if (arg.value) {
         ipcRenderer.send('navigate', 'login');

@@ -2,8 +2,28 @@
 // const {ipcRenderer} = electron;
 
 $(document).ready(function () {
-    $('#formAdd').off('submit').on('submit', submit.newFoodItem); 
+    $('#formAdd').off('submit').on('submit', submit.newFoodItem);
+    $('#ddlReqLogin').off('change').on('change', adminChange.reqLogin);
 });
+
+var adminChange = {
+    reqLogin: function () {
+        var dflt = false;
+        try {
+            var val = this.selectedOptions[0].value;
+            dflt = (val == 'true');
+        } catch (e) {
+            console.info('admin.js ' + e.message);
+        }
+
+
+        var data = {
+            label: 'Require Login',
+            updatedValue: dflt
+        };
+        ipcRenderer.send('update-setting', data);
+    }
+}
 
 var submit = {
     newFoodItem: function (e) {
@@ -24,8 +44,8 @@ var submit = {
     }
 };
 
-ipcRenderer.on('meal-add-reply', (event, arg) => { 
-     var messageOptions = {
+ipcRenderer.on('meal-add-reply', (event, arg) => {
+    var messageOptions = {
         body: 'Thank you!',
         title: 'Food item added'
     };
