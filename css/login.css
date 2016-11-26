@@ -4,7 +4,7 @@
 }
 .partial-container{
     top:-85vh;
-    transition: 1s;
+    transition: .5s;
 }
 .login-control{
    width: 50%;

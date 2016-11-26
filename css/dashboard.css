@@ -24,7 +24,7 @@ p{
     min-height: 200px;
     color:#fff;
     position:relative;
-    transition: 1s;
+    transition: 500ms;
 }
 
 .partial-container{
