@@ -10,6 +10,10 @@ var db = new Datastore({ filename: __dirname + '/setting.db', autoload: true });
 var dbAdmin = new Datastore({ filename: __dirname + '/admin.db', autoload: true });
 var dbFood = new Datastore({ filename: __dirname + '/food.db', autoload: true });
 
+db.insert({
+    label: 'Require Login',
+    value: true
+});
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let win
@@ -98,8 +102,14 @@ ipcMain.on('meal-window', (event, args) => {
 //admin page
 ipcMain.on('add-food', (event, args) => {
     dbFood.insert(args, function (err, doc) {
-        console.log('Inserted', doc.name, 'with ID', doc._id);
-        win.webContents.send('meal-add-reply', doc.name + ' added successfully!');
+        var rtrn = {};
+        if (!err) {
+            console.log('Inserted', doc.name, 'with ID', doc._id);
+            rtrn = { isError: false, message: 'Item saved successfully' };
+        } else {
+            rtrn = { isError: true, message: err };
+        }
+        win.webContents.send('meal-add-reply', rtrn);
     });
 });
 //these calls are to query the db

@@ -1,12 +1,12 @@
 module.exports = {
-    window : {
-         width: 950,
-         height: 700, 
-         frame: false, 
-         title :"Total Body Fitness",
-         webPreferences:{
-             devTools:true,
-             webSecurity:false
-         }
-     }
+    window: {
+        width: 1150,
+        height: 900,
+        frame: false,
+        title: "Total Body Fitness",
+        webPreferences: {
+            devTools: true,
+            webSecurity: false
+        }
+    }
 }

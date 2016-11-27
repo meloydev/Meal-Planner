@@ -1,5 +1,11 @@
+//foodAdd.js
+
 $(document).ready(function () {
+    //when the user changes the multiplier
+    $('#txtMulti').off('input').on('input', actions.multiplierChange);
+    //user click event for adding food
     $("#btnAddFood").off('click').click(actions.addItem);
+    //autocomplete stuff
     $('#txtAutoComplete').autocomplete({
         lookup: autocomplete.lookup,
         onSelect: autocomplete.onSelect
@@ -28,11 +34,35 @@ var actions = {
         var meal = $('#ddlMealNumber').val();
         var userSelectedValue = parseInt($('#txtMulti').val());
         //if not a number or less than 1, return 1
-        var multiplier = !isNaN(userSelectedValue) && userSelectedValue > 0 ? userSelectedValue : 1; 
+        var multiplier = !isNaN(userSelectedValue) && userSelectedValue > 0 ? userSelectedValue : 1;
         //add item to specific grid 
         grid.addRow(item, meal, multiplier);
         //remove had class if neccessary
         grid.unhideMeal(meal);
+    },
+    multiplierChange: function () {
+        try {
+            //grab the controls holding current values
+            var popCal = document.getElementById('popCal');
+            var popPro = document.getElementById('popPro');
+            var popCar = document.getElementById('popCarb');
+            var popFat = document.getElementById('popFat');
+            //currently selected item for base values
+            var item = JSON.parse(localStorage.getItem('food-item'));
+            //get the users new multiplier
+
+            var multiplier = parseFloat(this.value);
+            var safe = isNaN(multiplier) ? 1 : multiplier;
+            //place current values multiplied by new multiplier!
+            popCal.innerHTML = (item.calorie * safe).toFixed(2);
+            popPro.innerHTML = (item.protein * safe).toFixed(2);
+            popCar.innerHTML = (item.carb * safe).toFixed(2);
+            popFat.innerHTML = (item.fat * safe).toFixed(2);
+
+        } catch (error) {
+            alert('Select a food item first');
+            this.value = 1;
+        }
     }
 };
 
@@ -59,12 +89,14 @@ var grid = {
         grid.updateMacro(allFat, 9, allCal, 'lblMacroFat');
         grid.updateMacro(allCarb, 4, allCal, 'lblMacroCarb');
         grid.updateMacro(allProtein, 4, allCal, 'lblMacroPro');
+        //set contxt menu
+        $(row).on('contextmenu', grid.removeRow);
     },
     generateRow: function (data, multiplier) {
         var row = $('<tr>').append(
             $('<td>').text(data.name),
             $('<td>').text(data.category),
-            $('<td class="cal">').text(data.calories * multiplier),
+            $('<td class="cal">').text(data.calorie * multiplier),
             $('<td class="fat">').text(data.fat * multiplier),
             $('<td class="carb">').text(data.carb * multiplier),
             $('<td class="pro">').text(data.protein * multiplier)
@@ -109,6 +141,22 @@ var grid = {
         //remove class hiding meal[i]
         var tbl = $('#meal' + e);
         tbl.removeClass('meal-empty');
+    },
+    removeRow: function (e) {
+        //get context menu on meal page
+        var contextMenu = $('#contextMenu');
+        //show context menu
+        contextMenu.css({
+            position: "absolute",
+            left: e.pageX,
+            top: e.pageY,
+            display: "none"
+        }).slideDown(100);
+        //set events 
+        $('#btnRemoveFood').off('click').on('click', () => {
+            $(e.currentTarget).fadeOut(400).remove();
+            contextMenu.slideUp(100);
+        });
     }
 };
 
@@ -133,23 +181,19 @@ ipcRenderer.on('food-search-byId-result', (event, foodItem) => {
     var tbl = $(document.createElement("TABLE"));
     tbl.addClass('meal-popout');
     tbl.append($('<tr>').append(
-        $('<td>').text('Protein'),
-        $('<td>').text(foodItem.protein))); 
-    tbl.append($('<tr>').append(
-        $('<td>').text('Fat'),
-        $('<td>').text(foodItem.fat))); 
-    tbl.append($('<tr>').append(
         $('<td>').text('Calories'),
-        $('<td>').text(foodItem.calories))); 
+        $('<td id="popCal">').text(foodItem.calorie)));
+    tbl.append($('<tr>').append(
+        $('<td>').text('Protein'),
+        $('<td id="popPro">').text(foodItem.protein)));
     tbl.append($('<tr>').append(
         $('<td>').text('Carbs'),
-        $('<td>').text(foodItem.carb)));
- 
+        $('<td id="popCarb">').text(foodItem.carb)));
+    tbl.append($('<tr>').append(
+        $('<td>').text('Fat'),
+        $('<td id="popFat">').text(foodItem.fat)));
     el.popover('show');
     $('.popover-content').append(tbl);
-    // setTimeout(function () {
-    //     el.popover('hide');
-    // }, 5000);
 })
 //return for autocomplete server request
 ipcRenderer.on('food-search-result', (event, foodItems) => {

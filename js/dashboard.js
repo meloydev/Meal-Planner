@@ -1,3 +1,5 @@
+//dashboard.js
+
 const electron = require('electron');
 const {ipcRenderer} = electron;
 
@@ -22,7 +24,7 @@ var utilities = {
         // Let's check whether notification permissions have already been granted
         else if (Notification.permission === "granted") {
             // If it's okay let's create a notification
-            var notification = new Notification(messageOptions.title, messageOptions); 
+            var notification = new Notification(messageOptions.title, messageOptions);
         }
         // Otherwise, we need to ask the user for permission
         else if (Notification.permission !== 'denied') {
@@ -61,6 +63,7 @@ var click = {
 };
 
 // Listen for async-reply message from main process
+ipcRenderer.removeAllListeners('reply');
 ipcRenderer.on('reply', (event, arg) => {
     var container = $('#mainContent');
     container.fadeOut(300, function () {
@@ -71,8 +74,7 @@ ipcRenderer.on('reply', (event, arg) => {
 });
 
 //this is waiting for a settings value to be returned
-//from the main process, might have to change this up
-//to deal with multiple settings returned??
+ipcRenderer.removeAllListeners('return-setting');
 ipcRenderer.on('return-setting', (event, arg) => {
     console.log('Settings callback -- Location dashboard.js -- setting: ' + arg.label);
     if (arg.value) {

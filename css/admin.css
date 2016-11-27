@@ -20,3 +20,10 @@
     margin-top: 15%;
     width: 100%;
 }
+.caption{
+    height: 45px;
+    display: flex;
+    align-items: center;
+    color:#b4bcc2;
+    font-size:20.8px;
+}
