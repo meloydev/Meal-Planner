@@ -35,6 +35,22 @@ var utilities = {
                 }
             });
         }
+    },
+    //returns something like 1/28/1977
+    returnReadableDate: function (date) {
+        var startDate = new Date(date);
+        var day = ("0" + startDate.getDate()).slice(-2);
+        var month = ("0" + (startDate.getMonth() + 1)).slice(-2);
+        var nextMonth = ("0" + (startDate.getMonth() + 2)).slice(-2);
+        //more readable format
+        return (month) + '/' + (day) + '/' + startDate.getFullYear();
+    },
+    //this is used by input[type=date]
+    returnUsableDate: function (date) {
+        var startDate = new Date(date);
+        var day = ("0" + startDate.getDate()).slice(-2);
+        var month = ("0" + (startDate.getMonth() + 1)).slice(-2);
+        return startDate.getFullYear() + "-" + (month) + "-" + (day);
     }
 }
 var click = {

@@ -95,9 +95,13 @@ ipcMain.on('max', (event, args) => {
         win.maximize();
     }
 });
-ipcMain.on('meal-window', (event, args) => {
-    var partial = fs.readFileSync(path + '/partial/' + args + '.html', 'utf8');
-    win.webContents.send('meal-window-reply', partial);
+ipcMain.on('modal-window', (event, args) => {
+    var partial = fs.readFileSync(path + '/partial/' + args.body + '.html', 'utf8');
+    var partialReturn = {
+        body: partial,
+        title: args.title
+    };
+    win.webContents.send('modal-window-reply', partialReturn);
 });
 //admin page
 ipcMain.on('add-food', (event, args) => {

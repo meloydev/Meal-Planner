@@ -31,14 +31,30 @@ var callback = {
 var actions = {
     addItem: function () {
         var item = JSON.parse(localStorage.getItem('food-item'));
-        var meal = $('#ddlMealNumber').val();
-        var userSelectedValue = parseInt($('#txtMulti').val());
-        //if not a number or less than 1, return 1
-        var multiplier = !isNaN(userSelectedValue) && userSelectedValue > 0 ? userSelectedValue : 1;
-        //add item to specific grid 
-        grid.addRow(item, meal, multiplier);
-        //remove had class if neccessary
-        grid.unhideMeal(meal);
+        if (item != null) {
+            var meal = $('#ddlMealNumber').val();
+            var userSelectedValue = parseInt($('#txtMulti').val());
+            //if not a number or less than 1, return 1
+            var multiplier = !isNaN(userSelectedValue) && userSelectedValue > 0 ? userSelectedValue : 1;
+            //add item to specific grid 
+            grid.addRow(item, meal, multiplier);
+            //remove had class if neccessary
+            grid.unhideMeal(meal);
+
+            //clear form and ready  
+            var mealAddForm = document.getElementById('frmFoodAdd');
+            mealAddForm.reset();
+
+            localStorage.removeItem('food-item');
+        } else {
+            var messageOptions = {
+                body: 'Alert!',
+                title: 'Please select an item'
+            };
+            utilities.notify(messageOptions);
+        }
+        var txt = document.getElementById('txtAutoComplete');
+        txt.focus();
     },
     multiplierChange: function () {
         try {
@@ -54,10 +70,10 @@ var actions = {
             var multiplier = parseFloat(this.value);
             var safe = isNaN(multiplier) ? 1 : multiplier;
             //place current values multiplied by new multiplier!
-            popCal.innerHTML = (item.calorie * safe).toFixed(2);
-            popPro.innerHTML = (item.protein * safe).toFixed(2);
-            popCar.innerHTML = (item.carb * safe).toFixed(2);
-            popFat.innerHTML = (item.fat * safe).toFixed(2);
+            popCal.innerHTML = (item.calorie * safe).toFixed(1);
+            popPro.innerHTML = (item.protein * safe).toFixed(1);
+            popCar.innerHTML = (item.carb * safe).toFixed(1);
+            popFat.innerHTML = (item.fat * safe).toFixed(1);
 
         } catch (error) {
             alert('Select a food item first');
@@ -93,13 +109,15 @@ var grid = {
         $(row).on('contextmenu', grid.removeRow);
     },
     generateRow: function (data, multiplier) {
+        var safe = isNaN(multiplier) ? 1 : multiplier;
         var row = $('<tr>').append(
             $('<td>').text(data.name),
             $('<td>').text(data.category),
-            $('<td class="cal">').text(data.calorie * multiplier),
-            $('<td class="fat">').text(data.fat * multiplier),
-            $('<td class="carb">').text(data.carb * multiplier),
-            $('<td class="pro">').text(data.protein * multiplier)
+            $('<td>').text(multiplier + ' ' + data.serving),
+            $('<td class="cal">').text((data.calorie * safe).toFixed(1)),
+            $('<td class="fat">').text((data.fat * safe).toFixed(1)),
+            $('<td class="carb">').text((data.carb * safe).toFixed(1)),
+            $('<td class="pro">').text((data.protein * safe).toFixed(1))
         );
         return row;
     },

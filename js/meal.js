@@ -3,7 +3,8 @@
 $(document).ready(function () {
   $('.bottom-right').off('click').click(mealClick.buttonExpand);
   $('#btnPrint').off('click').click(mealClick.print);
-  $('#btnAdd').off('click').click(mealClick.addFood);
+  $('#btnAdd').off('click').click(mealClick.modal);
+  $('#btnUser').off('click').click(mealClick.modal);
   $('#contextMenu').on('mouseleave', mealHover.context);
 });
 
@@ -13,11 +14,12 @@ var mealClick = {
     $('.top-left').toggleClass("middle-fix");
     window.print();
   },
-  addFood: function () {
+  modal: function () {
     $('.base').toggleClass("base-expand");
     $('.top-left').toggleClass("middle-fix");
     var loc = $(this).data('location');
-    ipcRenderer.send('meal-window', loc);
+    var title = $(this).data('title');
+    ipcRenderer.send('modal-window', { body: loc, title: title });
   },
   buttonExpand: function () {
     $('.base').toggleClass("base-expand");
@@ -32,12 +34,15 @@ var mealHover = {
   }
 }
 // Listen for async-reply message from main process
-ipcRenderer.removeAllListeners('meal-window-reply');
-ipcRenderer.on('meal-window-reply', (event, arg) => {
+ipcRenderer.removeAllListeners('modal-window-reply');
+ipcRenderer.on('modal-window-reply', (event, arg) => {
   //modal window on parent page
   var popUp = $('#modal-window');
+  //set the title of the modal window
+  var title = popUp.find('.modal-dialog').find('.modal-title');
+  title.text(arg.title);
   //what is passed back
-  var contents = $(arg);
+  var contents = $(arg.body);
   //meat of the modal
   var popupBody = popUp.find('.modal-dialog').find('.modal-body');
   //clean it out

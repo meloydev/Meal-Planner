@@ -1,14 +1,14 @@
 <script src="./js/auto-complete.js"></script>
 <script src="./js/foodAdd.js"></script>
 
-<form action="" method="POST" role="form">
+<form id="frmFoodAdd" method="POST" role="form">
 	<div class="form-group">
 		<label for="food">Food/Supplement</label>
 		<input class="form-control" type="text" name="food" id="txtAutoComplete">
 	</div>
 	<div class="form-group">
-		<label for="">Meal</label>
-		<select class="form-control" id="ddlMealNumber" placeholder="Select One">
+		<label for="mealNumber">Meal</label>
+		<select name="mealNumber" class="form-control" id="ddlMealNumber" placeholder="Select One">
 			<option value="One" seleted>1</option>
 			<option value="Two">2</option>
 			<option value="Three">3</option>
@@ -18,8 +18,8 @@
 		</select>
 	</div>
 	<div class="form-group">
-		<label for="">How many servings?</label>
-		<input type="number" class="form-control" id="txtMulti" placeholder="Leaving blank will default to one serving">
+		<label for="servingSize">How many servings?</label>
+		<input name="servingSize" type="number" class="form-control" id="txtMulti" placeholder="Leaving blank will default to one serving">
 	</div>
 	<button id="btnAddFood" type="button" class="btn btn-primary">Add</button>
 </form>

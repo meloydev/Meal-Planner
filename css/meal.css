@@ -13,7 +13,7 @@ hr{
 }
 h3{
   color:#212121;
-}
+} 
 .setting{
   position:fixed;
   bottom:25px;
@@ -83,7 +83,9 @@ h3{
 .middle-fix{
    margin:15px;
 }
-
+.printTitle{
+  display: none;
+}
 .meal-container{
   background-color: #fff;
   position: relative;
@@ -107,19 +109,19 @@ td{
    text-align: center;
 }
 .meal-container table tr td{ 
- width: 30%;
+ width: 20%; 
 }
 .meal-container table tbody tr td{
  text-align: left;
  padding-left: 30px;
 }
 .meal-container table tr td:nth-child(n+2){ 
- width: 14%;
+ width: 13%; 
 }
 /*numeric columns */
 .meal-container table tbody tr td:nth-child(n+3){
  text-align: right; 
- padding-right: 10px;
+ padding-right: 25px;
 }
 .meal{
   visibility: visible;
@@ -129,6 +131,8 @@ td{
 .meal-empty{
   visibility: hidden;
   opacity: 0; 
+  height:0;
+  border:1px solid #fff;
 }
 .btn-circle{
   cursor: pointer;
@@ -169,6 +173,12 @@ td{
    }
 
 @media print{
+  #contextMenu{
+  display: none;
+  }
+  .printTitle{
+    display: block;
+  }
   .header{
     display: none;
   }

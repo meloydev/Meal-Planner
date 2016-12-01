@@ -4,11 +4,19 @@
 <img src="asset/tbf-350x350.png" alt="Logo" class="logo">
 <!--content-->
 <div class="meal-container">
+	<div class="printTitle">
+		<h3>
+			Meal plan for <strong id="lblPrintName">Name</strong><br>
+			<small><label id="lblPrintStart">start date</label> - <label id="lblPrintEnd">end date</label></small>
+		</h3>
+	</div>
+
 	<table>
 		<thead>
 			<tr>
 				<td>Food/Supplement</td>
 				<td>Category</td>
+				<td>Quantity</td>
 				<td>Calories</td>
 				<td>Fat, g</td>
 				<td>Carbs, g</td>
@@ -107,11 +115,11 @@
 	<div id="btnPrint" class="top-right circle sm btn-circle">
 		<a class="fa fa-print"></a>
 	</div>
-	<div class="top-left circle sm btn-circle">
-		<a class="fa fa-envelope"></a>
+	<div id="btnUser" data-location="user" data-title="Select User" class="top-left circle sm btn-circle">
+		<a data-location="user" data-title="Select User" class="fa fa-user"></a>
 	</div>
-	<div id="btnAdd" data-location="foodAdd" class="bottom-left circle sm btn-circle">
-		<a data-location="foodAdd" class="fa fa-plus"></a>
+	<div id="btnAdd" data-location="foodAdd" data-title="Add Food" class="bottom-left circle sm btn-circle">
+		<a data-location="foodAdd" data-title="Add Food" class="fa fa-plus"></a>
 	</div>
 	<div class="bottom-right circle md btn-circle">
 		<a class="fa fa-gears fa-2x"></a>
