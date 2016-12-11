@@ -12,6 +12,16 @@ var mealClick = {
   print: function () {
     $('.base').toggleClass("base-expand");
     $('.top-left').toggleClass("middle-fix");
+    //transfer info to print totals on top of page 
+    $('#lblPrintCal').html($('#lblCal').html());
+    $('#lblPrintPro').html($('#lblProtein').html());
+    $('#lblPrintFat').html($('#lblFat').html());
+    $('#lblPrintCarb').html($('#lblCarb').html());
+    //macros
+    $('#lblPrintProMacro').html($('#lblMacroPro').html());
+    $('#lblPrintFatMacro').html($('#lblMacroFat').html());
+    $('#lblPrintCarbMacro').html($('#lblMacroCarb').html());
+    //print the window
     window.print();
   },
   modal: function () {

@@ -10,10 +10,6 @@ var db = new Datastore({ filename: __dirname + '/setting.db', autoload: true });
 var dbAdmin = new Datastore({ filename: __dirname + '/admin.db', autoload: true });
 var dbFood = new Datastore({ filename: __dirname + '/food.db', autoload: true });
 
-db.insert({
-    label: 'Require Login',
-    value: true
-});
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let win
@@ -121,13 +117,20 @@ ipcMain.on('find-setting', (event, args) => {
     db.findOne({ label: args }, function (err, doc) {
         win.webContents.send('return-setting', doc);
     });
-});
-ipcMain.on('update-setting', (event, args) => {
-    var settingLabel = args.label;
-    var newValue = args.updatedValue;
-    db.update({ label: settingLabel }, { $set: { value: newValue } }, function (err, doc) {
-        console.log('Updated setting');
+    //get user defined CSS values
+    db.find({ label: 'css rule' }, function (err, doc) {
+        win.webContents.send('return-css', doc);
     });
+});
+//update or insert a new setting
+ipcMain.on('update-setting', (event, args) => {
+    var query = { label: args.label };
+    var update = { $set: { value: args.updatedValue } };
+    var options = { upsert: true };
+    var callBack = (err, doc) => {
+        console.log('Updated setting');
+    };
+    db.update(query, update, options, callBack);
 });
 //searches by food that contains char in args
 ipcMain.on('autocomplete-food-search', (event, args) => {

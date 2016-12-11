@@ -43,7 +43,7 @@ var actions = {
 
             //clear form and ready  
             var mealAddForm = document.getElementById('frmFoodAdd');
-            mealAddForm.reset();
+            //mealAddForm.reset();
 
             localStorage.removeItem('food-item');
         } else {

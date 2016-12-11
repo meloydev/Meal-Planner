@@ -3,6 +3,9 @@
 $(document).ready(function () {
     $('#formAdd').off('submit').on('submit', submit.newFoodItem);
     $('#ddlReqLogin').off('change').on('change', adminChange.reqLogin);
+    //change background color
+    var input = document.getElementById('colorPicker');
+    input.onchange = adminChange.color;
 });
 
 var adminChange = {
@@ -15,12 +18,22 @@ var adminChange = {
             console.info('admin.js ' + e.message);
         }
 
-
         var data = {
             label: 'Require Login',
             updatedValue: dflt
         };
         ipcRenderer.send('update-setting', data);
+    },
+    color: (ev) => {
+        document.documentElement.style.setProperty('--primary-color', ev.target.value);
+        var newValue = {
+            label: 'css rule',
+            updatedValue: {
+                property: '--primary-color',
+                value: ev.target.value
+            }
+        }
+        ipcRenderer.send('update-setting', newValue);
     }
 }
 
