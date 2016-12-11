@@ -134,10 +134,14 @@ ipcMain.on('update-setting', (event, args) => {
 });
 //searches by food that contains char in args
 ipcMain.on('autocomplete-food-search', (event, args) => {
-    var re = new RegExp(args, 'i');
-    dbFood.find({ name: re }, function (err, doc) {
-        win.webContents.send('food-search-result', doc);
-    });
+    try {
+        var re = new RegExp(args, 'i');
+        dbFood.find({ name: re }, function (err, doc) {
+            win.webContents.send('food-search-result', doc);
+        });
+    } catch (e) {
+        console.log(e.message);
+    }
 });
 //returns one food item based on ID
 ipcMain.on('food-search-byId', (event, args) => {

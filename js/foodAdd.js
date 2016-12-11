@@ -6,11 +6,13 @@ $(document).ready(function () {
     //user click event for adding food
     $("#btnAddFood").off('click').click(actions.addItem);
     //autocomplete stuff
-    $('#txtAutoComplete').autocomplete({
+    var el = $('#txtAutoComplete');
+    el.keydown(autocomplete.textChange);
+    el.autocomplete({
         lookup: autocomplete.lookup,
         onSelect: autocomplete.onSelect
     });
-    var el = $('#txtAutoComplete');
+
     var options = {
         template: '<div class="popover" role="tooltip" style="width: 200px;"><div class="arrow"></div><h3 class="popover-title"></h3><div class="popover-content"><div class="data-content"></div></div></div>',
         html: true,
@@ -43,9 +45,12 @@ var actions = {
 
             //clear form and ready  
             var mealAddForm = document.getElementById('frmFoodAdd');
-            //mealAddForm.reset();
 
-            localStorage.removeItem('food-item');
+
+            //mealAddForm.reset(); 
+            //localStorage.removeItem('food-item');
+
+
         } else {
             var messageOptions = {
                 body: 'Alert!',
@@ -185,6 +190,12 @@ var autocomplete = {
     },
     onSelect: function (selected) {
         ipcRenderer.send('food-search-byId', selected.data);
+    },
+    textChange: () => {
+        var el = $('.popover').fadeOut('fast', () => {
+            $(this).remove();
+        })
+        localStorage.removeItem('food-item');
     }
 }
 
@@ -212,9 +223,12 @@ ipcRenderer.on('food-search-byId-result', (event, foodItem) => {
         $('<td id="popFat">').text(foodItem.fat)));
     el.popover('show');
     $('.popover-content').append(tbl);
+    //set label serving type
+    var lbl = $('#servingSizeMeasurement').html(foodItem.serving + 's');
 })
 //return for autocomplete server request
 ipcRenderer.on('food-search-result', (event, foodItems) => {
+
     var suggestionArray = $.map(foodItems, function (i) {
         return { 'value': i.name, data: i._id }//map returned values for autocomplete
     });
@@ -223,6 +237,6 @@ ipcRenderer.on('food-search-result', (event, foodItems) => {
         suggestions: suggestionArray
     }
     //I know, ugly, but can't think of a 
-    //better way for now :(
+    //better way for now :(  
     callback.done(result);
 });

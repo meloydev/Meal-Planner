@@ -100,16 +100,12 @@
  }
  
  .printTitle {
-   /*display: none;*/
+   display: none;
  }
  
  .printTitle h3 {
    float: left;
  }
- /*.printTotals table tbody tr td {
-   text-align: right;
-   background-color: red;
- }*/
  
  .printTotals {
    width: 180px;
@@ -194,7 +190,7 @@
  
  .logo {
    height: 350px;
-   position: absolute;
+   position: fixed;
    bottom: 30vh;
    left: 035vw;
    z-index: 2;
