@@ -2,13 +2,14 @@ const {app, BrowserWindow, ipcMain} = require('electron');
 const auth = require('./auth');
 const setting = require('./settings');
 const fs = require('fs');
+const dbPath = process.env.HOMEPATH + '/Documents/Data';
 const path = `${__dirname}/`;
 
 //database stuff
 var Datastore = require('nedb');
-var db = new Datastore({ filename: __dirname + '/setting.db', autoload: true });
-var dbAdmin = new Datastore({ filename: __dirname + '/admin.db', autoload: true });
-var dbFood = new Datastore({ filename: __dirname + '/food.db', autoload: true });
+var db = new Datastore({ filename: dbPath + '/setting.db', autoload: true });
+var dbAdmin = new Datastore({ filename: dbPath + '/admin.db', autoload: true });
+var dbFood = new Datastore({ filename: dbPath + '/food.db', autoload: true });
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
