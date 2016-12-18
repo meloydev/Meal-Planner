@@ -45,11 +45,9 @@ var actions = {
 
             //clear form and ready  
             var mealAddForm = document.getElementById('frmFoodAdd');
-
-
-            //mealAddForm.reset(); 
-            //localStorage.removeItem('food-item');
-
+            //add notes to meal   
+            var customComment = $('#txtComment').val();
+            grid.addComment(meal, customComment);
 
         } else {
             var messageOptions = {
@@ -88,6 +86,15 @@ var actions = {
 };
 
 var grid = {
+    addComment: (meal, note) => {
+        if (note) {
+            var comment = $('#notesMeal' + meal);
+            var newComment = document.createElement('li');
+            newComment.innerHTML = note;
+            comment.show('fast');
+            comment.children('ul').append(newComment);
+        }
+    },
     addRow: function (a, b, c) {
         //get table body to append a new row
         var table = $('#tbl' + b + ' > tbody:last-child');
@@ -224,7 +231,9 @@ ipcRenderer.on('food-search-byId-result', (event, foodItem) => {
     el.popover('show');
     $('.popover-content').append(tbl);
     //set label serving type
-    var lbl = $('#servingSizeMeasurement').html(foodItem.serving + 's');
+    $('#servingSizeMeasurement').html(foodItem.serving + 's');
+    $('#txtMulti').val('1');
+    $('#txtComment').val(foodItem.comment);
 })
 //return for autocomplete server request
 ipcRenderer.on('food-search-result', (event, foodItems) => {

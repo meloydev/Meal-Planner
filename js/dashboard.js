@@ -3,7 +3,7 @@
 const electron = require('electron');
 const {ipcRenderer} = electron;
 
-$(document).ready(function() {
+$(document).ready(function () {
     $('#btnClose').click(click.close);
     $('[data-location]').click(click.navigate);
     //window functions
@@ -17,7 +17,7 @@ $(document).ready(function() {
     ipcRenderer.send('css-rule', null);
 })
 var utilities = {
-    notify: function(messageOptions) {
+    notify: function (messageOptions) {
         // Let's check if the browser supports notifications
         if (!("Notification" in window)) {
             alert(messageOptions.body);
@@ -29,7 +29,7 @@ var utilities = {
         }
         // Otherwise, we need to ask the user for permission
         else if (Notification.permission !== 'denied') {
-            Notification.requestPermission(function(permission) {
+            Notification.requestPermission(function (permission) {
                 // If the user accepts, let's create a notification
                 if (permission === "granted") {
                     new Notification(messageOptions.title, messageOptions);
@@ -38,7 +38,7 @@ var utilities = {
         }
     },
     //returns something like 1/28/1977
-    returnReadableDate: function(date) {
+    returnReadableDate: function (date) {
         var startDate = new Date(date);
         var day = ("0" + startDate.getDate()).slice(-2);
         var month = ("0" + (startDate.getMonth() + 1)).slice(-2);
@@ -47,7 +47,7 @@ var utilities = {
         return (month) + '/' + (day) + '/' + startDate.getFullYear();
     },
     //this is used by input[type=date]
-    returnUsableDate: function(date) {
+    returnUsableDate: function (date) {
         var startDate = new Date(date);
         var day = ("0" + startDate.getDate()).slice(-2);
         var month = ("0" + (startDate.getMonth() + 1)).slice(-2);
@@ -55,25 +55,25 @@ var utilities = {
     }
 }
 var click = {
-    navigate: function() {
+    navigate: function () {
         var loc = $(this).data('location');
-        $('.dashboard-links-container').fadeOut('slow', function() {
+        $('.dashboard-links-container').fadeOut('slow', function () {
             ipcRenderer.send('navigate', loc);
         });
     },
-    tool: function() {
+    tool: function () {
         ipcRenderer.send('tool');
     },
-    close: function() {
+    close: function () {
         ipcRenderer.send('close');
     },
-    minimize: function() {
+    minimize: function () {
         ipcRenderer.send('min');
     },
-    maximize: function() {
+    maximize: function () {
         ipcRenderer.send('max');
     },
-    home: function() {
+    home: function () {
         ipcRenderer.send('navigate', 'dashboard');
         $('.dashboard-links-container').delay(600).fadeIn('slow');
     }
@@ -83,7 +83,7 @@ var click = {
 ipcRenderer.removeAllListeners('reply');
 ipcRenderer.on('reply', (event, arg) => {
     var container = $('#mainContent');
-    container.fadeOut(300, function() {
+    container.fadeOut(300, function () {
         container.empty();
         $(arg).appendTo(container);
         container.fadeIn(300);
@@ -102,7 +102,7 @@ ipcRenderer.on('return-setting', (event, arg) => {
 });
 //any DB stored values for CSS properties are set here
 ipcRenderer.on('return-css', (event, arg) => {
-    arg.forEach(function(element) {
+    arg.forEach(function (element) {
         document.documentElement.style.setProperty(element.value.property, element.value.value);
     });
 });
