@@ -52,6 +52,18 @@ var utilities = {
         var day = ("0" + startDate.getDate()).slice(-2);
         var month = ("0" + (startDate.getMonth() + 1)).slice(-2);
         return startDate.getFullYear() + "-" + (month) + "-" + (day);
+    },
+    user: () => {
+        var client = JSON.parse(localStorage.getItem('SELECTED-CLIENT'));
+        if (client) {
+            return client;
+        } else {
+            return {
+                id: '',
+                firstName: '',
+                lastName: ''
+            };
+        }
     }
 }
 var click = {

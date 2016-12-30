@@ -61,4 +61,5 @@ ipcRenderer.on('modal-window-reply', (event, arg) => {
   contents.appendTo(popupBody);
   //show modal
   popUp.modal();
+  console.info(utilities.user());
 });

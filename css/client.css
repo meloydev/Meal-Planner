@@ -1,0 +1,89 @@
+ .base {
+   height: 60px;
+   width: 60px;
+   transition: .6s;
+ }
+ 
+ .base-expand {
+   height: 135px;
+   width: 135px;
+ }
+ 
+ .circle {
+   border-radius: 50%;
+   text-align: center;
+   font-size: 1.5em;
+   line-height: 2.4 !important;
+   box-shadow: 0 3px 13px rgba(0, 0, 0, 0.23), 0 3px 10px rgba(0, 0, 0, 0.16);
+ }
+ 
+ .sm:hover {
+   height: 52px;
+   width: 52px;
+   box-shadow: 10px 15px 15px rgba(0, 0, 0, 0.23);
+ }
+ 
+ .sm {
+   height: 50px;
+   width: 50px;
+   transition: .2s;
+ }
+ 
+ .md {
+   height: 75px;
+   width: 75px;
+   line-height: 4.2 !important;
+   transition: .4s;
+ }
+ 
+ .md:hover {
+   height: 76px;
+   width: 76px;
+   box-shadow: 10px 15px 15px rgba(0, 0, 0, 0.23);
+ }
+ 
+ .top-left {
+   position: absolute;
+   top: 0;
+   left: 0;
+   background-color: #E64A19;
+ }
+ 
+ .top-right {
+   position: absolute;
+   top: 0;
+   right: 0;
+   background-color: #1976D2;
+ }
+ 
+ .bottom-left {
+   position: absolute;
+   bottom: 0;
+   left: 0;
+   background-color: #9C27B0;
+ }
+ 
+ .bottom-right {
+   position: absolute;
+   bottom: 0;
+   right: 0;
+   background-color: var(--primary-color);
+ }
+ 
+ .middle-fix {
+   margin: 15px;
+ }
+ 
+  .setting {
+   position: fixed;
+   bottom: 25px;
+   right: 25px;
+ }
+ .main-table{
+  width: 90%;
+  margin: 0 auto;
+ }
+
+ table thead{
+   border-bottom: 2px solid #BDBDBD;
+ }

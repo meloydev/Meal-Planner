@@ -10,6 +10,7 @@ var Datastore = require('nedb');
 var db = new Datastore({ filename: dbPath + '/setting.db', autoload: true });
 var dbAdmin = new Datastore({ filename: dbPath + '/admin.db', autoload: true });
 var dbFood = new Datastore({ filename: dbPath + '/food.db', autoload: true });
+var dbClient = new Datastore({ filename: dbPath + '/client.db', autoload: true });
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -52,7 +53,6 @@ app.on('activate', () => {
         createWindow()
     }
 })
-
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
 ipcMain.on('login', function (event, args) {
@@ -67,7 +67,6 @@ ipcMain.on('login', function (event, args) {
     });
 
 });
-
 //These calls are from controls 
 //located on pages
 ipcMain.on('navigate', (event, args) => {
@@ -96,7 +95,8 @@ ipcMain.on('modal-window', (event, args) => {
     var partial = fs.readFileSync(path + '/partial/' + args.body + '.html', 'utf8');
     var partialReturn = {
         body: partial,
-        title: args.title
+        title: args.title,
+        values: args.values
     };
     win.webContents.send('modal-window-reply', partialReturn);
 });
@@ -150,6 +150,60 @@ ipcMain.on('food-search-byId', (event, args) => {
         win.webContents.send('food-search-byId-result', doc);
     });
 });
+//client page
+ipcMain.on('add-client', (event, args) => {
+    dbClient.insert(args, function (err, doc) {
+        var rtrn = {};
+        if (!err) {
+            console.log('Inserted', doc.firstName, 'with ID', doc._id);
+            rtrn = { isError: false, item: doc };
+        } else {
+            rtrn = { isError: true, message: err };
+        }
+        win.webContents.send('client-add-reply', rtrn);
+    });
+});
+ipcMain.on('update-client', (event, args) => {
+    var newValues = {
+        comment: args.comment,
+        email: args.email,
+        firstName: args.firstName,
+        lastName: args.lastName,
+        phone: args.phone,
+    };
+    dbClient.update(
+        { _id: args.id },
+        newValues,
+        function (err, numReplaced) {
+            var rtrn = {};
+            if (!err) {
+                rtrn = { isError: false, message: 'Item updated successfully', client: args };
+            } else {
+                rtrn = { isError: true, message: err };
+            }
+
+            win.webContents.send('client-update-reply', rtrn);
+        });
+});
+
+ipcMain.on('all-client', (event, args) => {
+    dbClient.find({}).sort({ lastName: 1, firstName: 1 }).exec(function (err, doc) {
+        win.webContents.send('client-all-reply', doc);
+    });
+});
+ipcMain.on('delete-client', (event, args) => {
+    dbClient.remove({ _id: args }, function (err, doc) {
+        var rtrn = {};
+        if (!err) {
+            rtrn = { isError: false, id: args };
+            win.webContents.send('client-remove-reply', rtrn);
+        } else {
+            rtrn = { isError: true, message: err.message };
+            win.webContents.send('client-remove-reply', rtrn);
+        }
+    });
+});
+
 
 
 
