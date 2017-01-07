@@ -15,6 +15,7 @@ $(document).ready(function () {
     //this gets initial partial to display 
     ipcRenderer.send('find-setting', 'Require Login');
     ipcRenderer.send('css-rule', null);
+    $('.user-name i').click(utilities.clearCurrentClient);
 })
 var utilities = {
     notify: function (messageOptions) {
@@ -53,17 +54,36 @@ var utilities = {
         var month = ("0" + (startDate.getMonth() + 1)).slice(-2);
         return startDate.getFullYear() + "-" + (month) + "-" + (day);
     },
-    user: () => {
+    currentClient: () => {
         var client = JSON.parse(localStorage.getItem('SELECTED-CLIENT'));
         if (client) {
             return client;
         } else {
             return {
-                id: '',
-                firstName: '',
-                lastName: ''
+                id: null,
+                firstName: null,
+                lastName: null
             };
         }
+    },
+    labelValue: (elementId) => {
+        let el = document.getElementById(elementId);
+        let value = el.innerText;
+        if (value != 'undefined') {
+            return value;
+        } else { return 'Error!' }
+    },
+    setCurrentClient: (e) => {
+        localStorage.setItem('SELECTED-CLIENT', JSON.stringify(e));
+        var client = $(".user-name");
+        client.find('span').html(`${e.firstName} ${e.lastName}`);
+        client.show();
+    },
+    clearCurrentClient: (e) => {
+        localStorage.removeItem('SELECTED-CLIENT');
+        var client = $(".user-name");
+        client.find('span').html('');
+        client.hide();
     }
 }
 var click = {

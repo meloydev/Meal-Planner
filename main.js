@@ -1,9 +1,15 @@
-const {app, BrowserWindow, ipcMain} = require('electron');
+const {app, BrowserWindow, ipcMain, dialog} = require('electron');
 const auth = require('./auth');
 const setting = require('./settings');
 const fs = require('fs');
-const dbPath = process.env.HOMEPATH + '/Documents/Data';
+const dbPath = process.env.HOMEPATH + '/Documents/Data/DataBase';
 const path = `${__dirname}/`;
+const extention = require('path');
+
+//this sets pathing app uses later 
+//app.setPath('image', extention.join(app.getPath('appData'), 'image'));
+//app.setPath('db', extention.join(app.getPath('appData'), 'dataBase'));
+//app.setPath('pdf', extention.join(app.getPath('appData'), 'pdf'));
 
 //database stuff
 var Datastore = require('nedb');
@@ -11,10 +17,13 @@ var db = new Datastore({ filename: dbPath + '/setting.db', autoload: true });
 var dbAdmin = new Datastore({ filename: dbPath + '/admin.db', autoload: true });
 var dbFood = new Datastore({ filename: dbPath + '/food.db', autoload: true });
 var dbClient = new Datastore({ filename: dbPath + '/client.db', autoload: true });
+var dbMeal = new Datastore({ filename: dbPath + '/meal.db', autoload: true });
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let win
+
+
 
 function createWindow() {
     // Create the browser window.
@@ -70,8 +79,10 @@ ipcMain.on('login', function (event, args) {
 //These calls are from controls 
 //located on pages
 ipcMain.on('navigate', (event, args) => {
-    var partial = fs.readFileSync(path + '/partial/' + args + '.html', 'utf8');
-    win.webContents.send('reply', partial);
+    let filePath = path + '/partial/' + args + '.html';
+    fs.readFile(filePath, 'utf8', function (err, data) {
+        win.webContents.send('reply', data);
+    });
 });
 //window functions
 ipcMain.on('tool', (event, args) => {
@@ -92,13 +103,15 @@ ipcMain.on('max', (event, args) => {
     }
 });
 ipcMain.on('modal-window', (event, args) => {
-    var partial = fs.readFileSync(path + '/partial/' + args.body + '.html', 'utf8');
-    var partialReturn = {
-        body: partial,
-        title: args.title,
-        values: args.values
-    };
-    win.webContents.send('modal-window-reply', partialReturn);
+    let filePath = path + '/partial/' + args.body + '.html';
+    fs.readFile(filePath, 'utf8', function (err, data) {
+        var partialReturn = {
+            body: data,
+            title: args.title,
+            values: args.values
+        };
+        win.webContents.send('modal-window-reply', partialReturn);
+    });
 });
 //admin page
 ipcMain.on('add-food', (event, args) => {
@@ -152,10 +165,13 @@ ipcMain.on('food-search-byId', (event, args) => {
 });
 //client page
 ipcMain.on('add-client', (event, args) => {
+    if (args.profileImage === "") {
+        //put in default image 
+        args.profileImage = `${process.env.USERPROFILE}\\Documents\\Data\\Image\\holder.png`
+    }
     dbClient.insert(args, function (err, doc) {
         var rtrn = {};
         if (!err) {
-            console.log('Inserted', doc.firstName, 'with ID', doc._id);
             rtrn = { isError: false, item: doc };
         } else {
             rtrn = { isError: true, message: err };
@@ -164,16 +180,13 @@ ipcMain.on('add-client', (event, args) => {
     });
 });
 ipcMain.on('update-client', (event, args) => {
-    var newValues = {
-        comment: args.comment,
-        email: args.email,
-        firstName: args.firstName,
-        lastName: args.lastName,
-        phone: args.phone,
-    };
+    if (args.profileImage === "") {
+        //put in default image 
+        args.profileImage = `${process.env.USERPROFILE}\\Documents\\Data\\Image\\holder.png`
+    }
     dbClient.update(
         { _id: args.id },
-        newValues,
+        args,
         function (err, numReplaced) {
             var rtrn = {};
             if (!err) {
@@ -181,11 +194,10 @@ ipcMain.on('update-client', (event, args) => {
             } else {
                 rtrn = { isError: true, message: err };
             }
-
+            //send response of update
             win.webContents.send('client-update-reply', rtrn);
         });
 });
-
 ipcMain.on('all-client', (event, args) => {
     dbClient.find({}).sort({ lastName: 1, firstName: 1 }).exec(function (err, doc) {
         win.webContents.send('client-all-reply', doc);
@@ -203,7 +215,118 @@ ipcMain.on('delete-client', (event, args) => {
         }
     });
 });
+//meal plan
+ipcMain.on('add-meal', (event, args) => {
+    //remove any current diet
+    dbMeal.remove({ client: args.client }, { multi: true });
+    //add the new diet
+    dbMeal.insert(args, function (err, doc) {
+        var rtrn = {};
+        if (!err) {
+            rtrn = { isError: false, item: doc };
+        } else {
+            rtrn = { isError: true, message: err };
+        }
+        win.webContents.send('meal-add-reply', rtrn);
+    });
+});
 
+ipcMain.on('find-meal', (event, args) => {
+    //remove any current diet
+    dbMeal.findOne({ client: args.id }, (err, doc) => {
+        rtrn = {};
+        if (err) {
+            rtrn.isError = true;
+            rtrn.message = err.message;
+        } else {
+            rtrn.isError = false;
+            rtrn.meal = doc;
+        }
+        win.webContents.send('meal-find-reply', rtrn);
+    });
+});
+//client page
+ipcMain.on('generate-client-rows', (event, args) => {
+    //get template to workwith
+    let filePath = path + '/template/client.html';
+    var template = fs.readFileSync(filePath, 'utf8');
+    let imgPath = process.env.HOMEPATH + '/Documents/Data/image';
+    //create row for each client
+    for (var i = 0; i < args.length; i++) {
+        var client = args[i];
+        var rtrn = {
+            html: template,
+            client: client
+        };
+        //my kickass template engine :)
+        for (var propertyName in client) {
+            rtrn.html = rtrn.html.replace('${' + propertyName + '}', client[propertyName]);
+        }
+        win.webContents.send('client-rows-reply', rtrn);
+    }
+});
+
+
+
+
+
+//   this is where I am testing stuff out!!!!
+//   this is where I am testing stuff out!!!!
+//   this is where I am testing stuff out!!!!
+//   this is where I am testing stuff out!!!!
+//   this is where I am testing stuff out!!!!
+//   this is where I am testing stuff out!!!!
+//   this is where I am testing stuff out!!!!
+
+
+
+
+
+
+
+
+//a little demo on how to use the showOpenDialog
+// ipcMain.on('show-save', (event, args) => {
+//     var options = {
+//         filters: [
+//             { name: 'Images', extensions: ['jpg', 'png', 'gif'] }
+//         ]
+//     }
+
+//     var x = function (filePath) {
+//         if (filePath.length > 0) {
+
+//             let i = {
+//                 ext: extention.extname(filePath[0]),
+//                 name: this.user,
+//                 newPath: app.getPath('client-image'),
+//                 img: fs.readFileSync(filePath[0])
+//             };
+
+//             fs.writeFile(`${i.newPath}/${i.name}${i.ext}`, i.img);
+//         }
+//     }
+
+//     dialog.showOpenDialog(null, options, (x).bind(args));
+
+
+
+// });
+
+
+//a little demo on how the show message works
+// ipcMain.on('show-message', (event, args) => {
+//     var options = {
+//         type: 'info',
+//         title: 'this is the title!',
+//         detail: 'a little info here',
+//         message: 'you done messed up a a ron!',
+//         buttons: ['yes', 'no', 'help']
+//     };
+//     dialog.showMessageBox(null, options, (response) => {
+
+//     });
+// });
 
 
 

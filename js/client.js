@@ -33,13 +33,14 @@ var clientClick = {
     editClientItem: (e) => {
         e.preventDefault();
         var data = {
-            id: e.data.values.id
+            id: e.data.values._id
         };
         var form = $("#formAddClient :input").serializeArray();
         for (var index = 0; index < form.length; index++) {
             var element = form[index];
             data[element.name] = element.value;
         }
+        debugger;
         ipcRenderer.send('update-client', data);
     },
     delete: (e) => {
@@ -49,15 +50,12 @@ var clientClick = {
             ipcRenderer.send('delete-client', client.id);
         }
     },
-    select: (e) => {
+    meal: (e) => {
         var selectedClient = e.data;
         //set client "Session"
-        localStorage.setItem('SELECTED-CLIENT', JSON.stringify(selectedClient));
-        var messageOptions = {
-            body: selectedClient.firstName + ' ' + selectedClient.lastName + ' has been selected',
-            title: 'Client Select'
-        };
-        utilities.notify(messageOptions);
+        //localStorage.setItem('SELECTED-CLIENT', JSON.stringify(selectedClient));
+        utilities.setCurrentClient(selectedClient);
+        ipcRenderer.send('navigate', 'meal');
     },
     edit: (e) => {
         ipcRenderer.send('modal-window',
@@ -127,14 +125,23 @@ ipcRenderer.on('modal-window-reply', (event, arg) => {
     contents.appendTo(popupBody);
     //show modal
     popUp.modal();
-
+    //if we sent back arguments, then it's an update not an add client.
     if (arg.values) {
+        var client = arg.values;
         //send edit command 
-        $('#txtClientfName').val(arg.values.firstName);
-        $('#txtClientlName').val(arg.values.lastName);
-        $('#txtClientEmail').val(arg.values.email);
-        $('#txtClientPhone').val(arg.values.phone);
-        $('#txtUserPopComment').val(arg.values.comment);
+        $('#txtClientfName').val(client.firstName);
+        $('#txtClientlName').val(client.lastName);
+        $('#txtClientEmail').val(client.email);
+        $('#txtClientPhone').val(client.phone);
+        $('#txtUserPopComment').val(client.comment);
+        //address
+        $('#txtClientAddress').val(client.address);
+        $('#txtClientlCity').val(client.city);
+        $('#cbClientState').val(client.state);
+        $('#txtClientPostal').val(client.postalCode);
+        //image
+        $('#txtProfileImgUrl').val(client.profileImage);
+        //click event
         $('#btnSubmitClient').off('click').click(arg, clientClick.editClientItem);
     } else {
         //send add command
@@ -148,38 +155,22 @@ ipcRenderer.on('client-add-reply', (event, arg) => {
     if (arg.isError) {
         utilities.notify(arg.message);
     } else {
-        var pass = {
-            id: arg.item._id,
-            firstName: arg.item.firstName,
-            lastName: arg.item.lastName,
-            email: arg.item.email,
-            phone: arg.item.phone,
-            comment: arg.item.comment,
-        };
-        var row = grid.row(pass);
-        let table = $('#tblClient');
-        row.hide().appendTo(table).fadeIn(1000);
+        //clear form
+        document.getElementById('formAddClient').reset();
+        //remove all rows from table
+        let tbl = $('#tblClient tbody');
+        tbl.find('tr').remove();
+        //get all users again... easier than building a row.
+        ipcRenderer.send('all-client', {});
     }
 });
 //After SELECT all on clients is performed
 ipcRenderer.removeAllListeners('client-all-reply');
 ipcRenderer.on('client-all-reply', (event, arg) => {
-    try {
-        arg.forEach((item, index) => {
-            var pass = {
-                id: item._id,
-                firstName: item.firstName,
-                lastName: item.lastName,
-                email: item.email,
-                phone: item.phone,
-                comment: item.comment,
-            };
-            let row = grid.row(pass);
-            let table = $('#tblClient');
-            row.hide().appendTo(table).fadeIn(1000);
-        });
-    } catch (e) {
-        console.error(e.message);
+    if (arg.isError) {
+        utilities.notify(arg.message);
+    } else {
+        ipcRenderer.send('generate-client-rows', arg);
     }
 });
 //After a client has been "Deleted"
@@ -222,5 +213,18 @@ ipcRenderer.on('client-update-reply', (event, arg) => {
         });
     }
 });
-
+//client-rows-reply
+ipcRenderer.removeAllListeners('client-rows-reply');
+ipcRenderer.on('client-rows-reply', (event, arg) => {
+    if (arg.isError) {
+        utilities.notify(arg.message);
+    } else {
+        let tbl = $('#tblClient tbody');
+        let row = $(arg.html);
+        //set row actions
+        row.find('.clientEdit').click(arg.client, clientClick.edit);
+        row.find('.clientMeal').click(arg.client, clientClick.meal);
+        row.hide().appendTo(tbl).fadeIn(1000);
+    }
+});
 

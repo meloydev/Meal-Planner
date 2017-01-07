@@ -35,7 +35,7 @@
    min-height: 200px;
    color: #fff;
    position: relative;
-   transition: 500ms;
+   transition: 500ms; 
  }
  
  .partial-container {
@@ -57,13 +57,21 @@
  .window-control i {
    padding: 0 5px;
  }
- 
+ .user-name{
+   width:150px;
+   text-align: center;
+   margin: 0 auto;
+   padding-top:10px;
+   text-transform: capitalize;
+   display: none;
+ }
  .tools {
    position: fixed;
    top: 0;
    left: 0;
-   margin: 10px;
+   margin: 10px; 
  }
+
  /*Menu control*/
  
  .circle {

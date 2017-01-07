@@ -40,7 +40,7 @@ var actions = {
             var multiplier = !isNaN(userSelectedValue) && userSelectedValue > 0 ? userSelectedValue : 1;
             //add item to specific grid 
             grid.addRow(item, meal, multiplier);
-            //remove had class if neccessary
+            //remove hide class if neccessary
             grid.unhideMeal(meal);
 
             //clear form and ready  
@@ -86,7 +86,7 @@ var actions = {
 };
 
 var grid = {
-    addComment: (meal, note) => {
+    addComment: function (meal, note) {
         if (note) {
             var comment = $('#notesMeal' + meal);
             var newComment = document.createElement('li');
@@ -95,7 +95,7 @@ var grid = {
             comment.children('ul').append(newComment);
         }
     },
-    addRow: function (a, b, c) {
+    addRow: function (a, b, c) { //item, meal, multiplier
         //get table body to append a new row
         var table = $('#tbl' + b + ' > tbody:last-child');
         //create row from dropdown selection

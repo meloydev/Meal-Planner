@@ -2,11 +2,70 @@
 
 $(document).ready(function () {
   $('.bottom-right').off('click').click(mealClick.buttonExpand);
-  $('#btnPrint').off('click').click(mealClick.print);
+  $('#btnPrint').off('click').click(mealClick.save);
   $('#btnAdd').off('click').click(mealClick.modal);
   $('#btnUser').off('click').click(mealClick.modal);
   $('#contextMenu').on('mouseleave', mealHover.context);
+  load.page();
 });
+
+var load = {
+  page: () => {
+    //check for a selected client to load saved meal
+    let client = utilities.currentClient();
+    if (client.id) {
+      ipcRenderer.send('find-meal', client);
+    }
+  }
+}
+
+var mealSave = {
+  save: (clientId) => {
+    //list of tables making up the meal plan
+    let elements = ['One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine'];
+    //mealplan object
+    var mealPlan = {
+      client: clientId,
+      tables: [],
+      totals: {
+        calories: utilities.labelValue('lblCal'),
+        protein: utilities.labelValue('lblProtein'),
+        fat: utilities.labelValue('lblFat'),
+        carb: utilities.labelValue('lblCarb')
+      },
+      macros: {
+        protein: utilities.labelValue('lblMacroPro'),
+        fat: utilities.labelValue('lblMacroFat'),
+        carb: utilities.labelValue('lblMacroCarb'),
+      }
+    };
+
+    for (var index = 0; index < elements.length; index++) {
+      var tbl = {
+        table: elements[index],
+        items: []
+      };
+      let tblRows = $('#tbl' + elements[index] + ' tbody tr');
+
+      tblRows.each(function (index, item) {
+        let columns = $(item).find('td');
+        //add meal to table's items array
+        tbl.items.push({
+          name: columns[0].innerHTML,
+          category: columns[1].innerHTML,
+          Quantity: columns[2].innerHTML,
+          Calories: columns[3].innerHTML,
+          Fat: columns[4].innerHTML,
+          Carb: columns[5].innerHTML,
+          Protein: columns[6].innerHTML
+        });
+      });
+      mealPlan.tables.push(tbl);
+    }
+    //call main process
+    ipcRenderer.send('add-meal', mealPlan);
+  }
+}
 
 var mealClick = {
   print: function () {
@@ -35,6 +94,49 @@ var mealClick = {
     $('.base').toggleClass("base-expand");
     //padding for that middle button
     $('.top-left').toggleClass("middle-fix");
+  },
+  save: function () {
+    var clientId = utilities.currentClient().id;
+    if (clientId) {
+      mealSave.save(clientId);
+    } else {
+      //TODO: somehow save a meal "Template (no client)"
+    }
+  },
+  load: function (meals) {
+    //set macros  
+    if (meals.macros) {
+      document.getElementById('lblMacroFat').innerHTML = meals.macros.fat;
+      document.getElementById('lblMacroCarb').innerHTML = meals.macros.carb;
+      document.getElementById('lblMacroPro').innerHTML = meals.macros.protein;
+    }
+    //and totals
+    if (meals.totals) {
+      document.getElementById('lblCal').innerHTML = meals.totals.calories;
+      document.getElementById('lblFat').innerHTML = meals.totals.fat;
+      document.getElementById('lblCarb').innerHTML = meals.totals.carb;
+      document.getElementById('lblProtein').innerHTML = meals.totals.protein;
+    }
+    $(meals.tables).each((index, meal) => {
+      //get table
+      var container = $('#meal' + meal.table);
+      let tbl = $('#tbl' + meal.table);
+      //create rows 
+      for (var i = 0; i < meal.items.length; i++) {
+        container.removeClass('meal-empty');
+        let item = meal.items[i];
+        let row = $('<tr>').append(
+          $('<td>').text(item.name),
+          $('<td>').text(item.category),
+          $('<td>').text(item.Quantity),
+          $('<td class="cal">').text(item.Calories),
+          $('<td class="fat">').text(item.Fat),
+          $('<td class="carb">').text(item.Carb),
+          $('<td class="pro">').text(item.Protein)
+        );
+        row.hide().appendTo(tbl).fadeIn(1000);
+      }
+    });
   }
 };
 
@@ -61,5 +163,36 @@ ipcRenderer.on('modal-window-reply', (event, arg) => {
   contents.appendTo(popupBody);
   //show modal
   popUp.modal();
-  console.info(utilities.user());
+  //right now, I'm only popping the one window
+  //this code won't work if multiple windows are opened
+  //in the future
+  var client = utilities.currentClient();
+  $('#txtUserPopName').val(client.firstName + ' ' + client.lastName);
+});
+ipcRenderer.removeAllListeners('meal-add-reply');
+ipcRenderer.on('meal-add-reply', (event, arg) => {
+  var messageOptions = {
+    body: '',
+    title: ''
+  };
+  if (arg.isError) {
+    messageOptions.body = arg.message;
+    messageOptions.title = 'Error';
+  } else {
+    messageOptions.body = 'Complete';
+    messageOptions.title = 'Meal plan has been saved';
+  }
+  utilities.notify(messageOptions);
+});
+ipcRenderer.removeAllListeners('meal-find-reply');
+ipcRenderer.on('meal-find-reply', (event, arg) => {
+  if (arg.isError) {
+    var messageOptions = {
+      body: arg.message,
+      title: 'Error!'
+    }
+    utilities.notify(messageOptions);
+  } else {
+    mealClick.load(arg.meal);
+  }
 });

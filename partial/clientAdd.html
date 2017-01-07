@@ -1,23 +1,69 @@
 <form action="POST" role="form" id="formAddClient">
-    <div class="form-group">
-        <label for="firstName">First Name</label>
-        <input class="form-control" name="firstName" id="txtClientfName" type="text" required />
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="firstName">First Name</label>
+                    <input class="form-control" name="firstName" id="txtClientfName" type="text" required />
+                </div>
+                <div class="form-group">
+                    <label for="lastName">Last Name</label>
+                    <input class="form-control" name="lastName" id="txtClientlName" type="text" required />
+                </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input class="form-control" name="email" id="txtClientEmail" type="text" required />
+                </div>
+                <div class="form-group">
+                    <label for="phone">Phone</label>
+                    <input class="form-control" name="phone" id="txtClientPhone" type="text" required />
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="address">Address</label>
+                    <input class="form-control" name="address" id="txtClientAddress" type="text" required />
+                </div>
+                <div class="form-group">
+                    <label for="city">City</label>
+                    <input class="form-control" name="city" id="txtClientlCity" type="text" required />
+                </div>
+                <div class="form-group">
+                    <label for="state">State</label>
+                    <select class="form-control" name="state" id="cbClientState">
+                        <option value="KS" selected>Kansas</option>
+                        <option value="MO" selected>Missouri</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="postalCode">Postal Code</label>
+                    <input class="form-control" name="postalCode" id="txtClientPostal" type="text" required />
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label for="comment">Comments</label>
+                    <textarea id="txtUserPopComment" rows="4" class="form-control" name="comment" style="resize: none;" maxlength="100"></textarea>
+</div>
+</div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="form-group">
+            <div class="input-group">
+                <input type="text" class="form-control" name="profileImage" id="txtProfileImgUrl" placeholder="No profile image">
+                <span class="input-group-btn">
+                        <button class="btn btn-default" type="button">Select</button>
+                    </span>
+            </div>
+        </div>
     </div>
-    <div class="form-group">
-        <label for="lastName">Last Name</label>
-        <input class="form-control" name="lastName" id="txtClientlName" type="text" required />
-    </div>
-    <div class="form-group">
-        <label for="email">Email</label>
-        <input class="form-control" name="email" id="txtClientEmail" type="text" required />
-    </div>
-    <div class="form-group">
-        <label for="phone">Phone</label>
-        <input class="form-control" name="phone" id="txtClientPhone" type="text" required />
-    </div>
-    <div class="form-group">
-        <label for="comment">Comments</label>
-        <textarea id="txtUserPopComment" rows="4" class="form-control" name="comment" style="resize: none;" maxlength="100" />
+</div>
+
+
 </div>
 <button id="btnSubmitClient" type="submit" class="btn btn-primary">Submit</button>
 </form>
