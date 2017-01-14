@@ -40,7 +40,6 @@ var clientClick = {
             var element = form[index];
             data[element.name] = element.value;
         }
-        debugger;
         ipcRenderer.send('update-client', data);
     },
     delete: (e) => {
@@ -64,48 +63,12 @@ var clientClick = {
                 title: 'Edit Client',
                 values: e.data
             });
+    },
+    image: (e) => {
+        let client = e.data;
+        ipcRenderer.send('image-save', client);
     }
 };
-//Methods that pertain to the table on Clients page
-var grid = {
-    row: (val) => {
-        //create row 
-        let row = $('<tr>').append(
-            grid.actions(val),
-            $('<td>').text(val.firstName),
-            $('<td>').text(val.lastName),
-            $('<td>').text(val.email),
-            $('<td>').text(val.phone),
-            $('<td>').text(val.comment));
-        row.attr('id', val.id);
-
-        return row;
-    },
-    actions: (client) => {
-        //make actions column
-        let container = $('<div>').addClass('btn-group');
-        let td = $('<td>');
-        //create action buttons
-        let select = $('<button>')
-            .addClass('btn btn-xs btn-default')
-            .text('Select')
-            .click(client, clientClick.select);
-        let edit = $('<button>')
-            .addClass('btn btn-xs btn-info')
-            .text('Edit')
-            .click(client, clientClick.edit);
-        let active = $('<button>')
-            .addClass('btn btn-xs btn-danger')
-            .text('Delete')
-            .click(client, clientClick.delete);
-        //add buttons to column
-        container.append(select);
-        container.append(edit);
-        container.append(active);
-        td.append(container);
-        return td;
-    }
-}
 
 // Listen for async-reply message from main process
 ipcRenderer.removeAllListeners('modal-window-reply');
@@ -125,27 +88,28 @@ ipcRenderer.on('modal-window-reply', (event, arg) => {
     contents.appendTo(popupBody);
     //show modal
     popUp.modal();
-    //if we sent back arguments, then it's an update not an add client.
+    //if we sent back arguments, then it's an update not an add client. 
     if (arg.values) {
         var client = arg.values;
-        //send edit command 
-        $('#txtClientfName').val(client.firstName);
-        $('#txtClientlName').val(client.lastName);
-        $('#txtClientEmail').val(client.email);
-        $('#txtClientPhone').val(client.phone);
-        $('#txtUserPopComment').val(client.comment);
-        //address
-        $('#txtClientAddress').val(client.address);
-        $('#txtClientlCity').val(client.city);
-        $('#cbClientState').val(client.state);
-        $('#txtClientPostal').val(client.postalCode);
-        //image
-        $('#txtProfileImgUrl').val(client.profileImage);
+
+        //set control values based on name property
+        for (var propertyName in client) {
+            var control = $(`[name='${propertyName}']`);
+            if (control) {
+                control.val(client[propertyName]);
+            }
+        }
+
         //click event
         $('#btnSubmitClient').off('click').click(arg, clientClick.editClientItem);
+        $('#btnAddClientImg').click(client, clientClick.image);
     } else {
         //send add command
         $('#btnSubmitClient').off('click').click(clientClick.newClientItem);
+        //TODO: adding image to NEW client
+        let ma = Math.random() * 100;
+        console.info(ma);
+        //$('#btnAddClientImg').click(client, clientClick.image);
     }
 
 });
@@ -199,18 +163,11 @@ ipcRenderer.on('client-update-reply', (event, arg) => {
         };
         utilities.notify(messageOptions);
     } else { // no error, notify and change grid data
-        var messageOptions = {
-            body: 'Client has been updated',
-            title: 'Success!'
-        };
-        utilities.notify(messageOptions);
-
-        var clientTable = $('#tblClient > tbody');
-        var row = $('#' + arg.client.id);          //outdated row  
-        row.fadeOut('fast', function () {
-            var updatedRow = grid.row(arg.client); //new udpated row
-            $(this).after(updatedRow).remove();    //remove old row, and replace with new!
-        });
+        //remove all rows from table
+        let tbl = $('#tblClient tbody');
+        tbl.find('tr').remove();
+        //get all users again... easier than building a row.
+        ipcRenderer.send('all-client', {});
     }
 });
 //client-rows-reply
@@ -225,6 +182,15 @@ ipcRenderer.on('client-rows-reply', (event, arg) => {
         row.find('.clientEdit').click(arg.client, clientClick.edit);
         row.find('.clientMeal').click(arg.client, clientClick.meal);
         row.hide().appendTo(tbl).fadeIn(1000);
+    }
+});
+//image save
+ipcRenderer.removeAllListeners('image-save-reply');
+ipcRenderer.on('image-save-reply', (event, arg) => {
+    if (arg.isError) {
+        utilities.notify(arg.message);
+    } else {
+        $('#txtProfileImgUrl').val(arg.url);
     }
 });
 

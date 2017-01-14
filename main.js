@@ -1,29 +1,23 @@
 const {app, BrowserWindow, ipcMain, dialog} = require('electron');
+const fs = require('fs');
+const path = require('path');
 const auth = require('./auth');
 const setting = require('./settings');
-const fs = require('fs');
-const dbPath = process.env.HOMEPATH + '/Documents/Data/DataBase';
-const path = `${__dirname}/`;
-const extention = require('path');
-
-//this sets pathing app uses later 
-//app.setPath('image', extention.join(app.getPath('appData'), 'image'));
-//app.setPath('db', extention.join(app.getPath('appData'), 'dataBase'));
-//app.setPath('pdf', extention.join(app.getPath('appData'), 'pdf'));
+//local pathing
+const dbPath = `${process.env.USERPROFILE}\\Documents\\Data\\DataBase`;
+const imgPath = `${process.env.USERPROFILE}\\Documents\\Data\\image`;
 
 //database stuff
 var Datastore = require('nedb');
-var db = new Datastore({ filename: dbPath + '/setting.db', autoload: true });
-var dbAdmin = new Datastore({ filename: dbPath + '/admin.db', autoload: true });
-var dbFood = new Datastore({ filename: dbPath + '/food.db', autoload: true });
-var dbClient = new Datastore({ filename: dbPath + '/client.db', autoload: true });
-var dbMeal = new Datastore({ filename: dbPath + '/meal.db', autoload: true });
+var db = new Datastore({ filename: `${dbPath}\\setting.db`, autoload: true });
+var dbAdmin = new Datastore({ filename: `${dbPath}\\admin.db`, autoload: true });
+var dbFood = new Datastore({ filename: `${dbPath}\\food.db`, autoload: true });
+var dbClient = new Datastore({ filename: `${dbPath}\\client.db`, autoload: true });
+var dbMeal = new Datastore({ filename: `${dbPath}\\meal.db`, autoload: true });
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
-let win
-
-
+let win;
 
 function createWindow() {
     // Create the browser window.
@@ -68,7 +62,8 @@ ipcMain.on('login', function (event, args) {
     dbAdmin.findOne({ userName: args.userName }, function (err, user) {
         if (user !== null && user.userName === args.userName &&
             user.passWord === args.passWord) {
-            var partial = fs.readFileSync(path + '/partial/dashboard.html', 'utf8');
+            let filePath = `${__dirname}/partial/dashboard.html`;
+            var partial = fs.readFileSync(filePath, 'utf8');
             win.webContents.send('reply', partial);
         } else {
             //TODO..
@@ -79,7 +74,7 @@ ipcMain.on('login', function (event, args) {
 //These calls are from controls 
 //located on pages
 ipcMain.on('navigate', (event, args) => {
-    let filePath = path + '/partial/' + args + '.html';
+    let filePath = `${__dirname}/partial/${args}.html`;
     fs.readFile(filePath, 'utf8', function (err, data) {
         win.webContents.send('reply', data);
     });
@@ -103,7 +98,7 @@ ipcMain.on('max', (event, args) => {
     }
 });
 ipcMain.on('modal-window', (event, args) => {
-    let filePath = path + '/partial/' + args.body + '.html';
+    let filePath = `${__dirname}/partial/${args.body}.html`;
     fs.readFile(filePath, 'utf8', function (err, data) {
         var partialReturn = {
             body: data,
@@ -113,6 +108,8 @@ ipcMain.on('modal-window', (event, args) => {
         win.webContents.send('modal-window-reply', partialReturn);
     });
 });
+
+
 //admin page
 ipcMain.on('add-food', (event, args) => {
     dbFood.insert(args, function (err, doc) {
@@ -163,6 +160,8 @@ ipcMain.on('food-search-byId', (event, args) => {
         win.webContents.send('food-search-byId-result', doc);
     });
 });
+
+
 //client page
 ipcMain.on('add-client', (event, args) => {
     if (args.profileImage === "") {
@@ -203,6 +202,13 @@ ipcMain.on('all-client', (event, args) => {
         win.webContents.send('client-all-reply', doc);
     });
 });
+// ipcMain.on('one-client', (event, args) => {
+//     dbClient.find({ _id: args._id }, args, function (err, doc) {
+//         if (!err) {
+//             win.webContents.send('client-all-reply', doc);
+//         }
+//     });
+// });
 ipcMain.on('delete-client', (event, args) => {
     dbClient.remove({ _id: args }, function (err, doc) {
         var rtrn = {};
@@ -215,6 +221,26 @@ ipcMain.on('delete-client', (event, args) => {
         }
     });
 });
+ipcMain.on('generate-client-rows', (event, args) => {
+    //get template to workwith
+    let filePath = `${__dirname}/template/client.html`;
+    var template = fs.readFileSync(filePath, 'utf8');
+    let imgPath = process.env.ProgramData; + '/image';
+    //create row for each client
+    for (var i = 0; i < args.length; i++) {
+        var client = args[i];
+        var rtrn = {
+            html: template,
+            client: client
+        };
+        //my kickass template engine :)
+        for (var propertyName in client) {
+            rtrn.html = rtrn.html.replace('${' + propertyName + '}', client[propertyName]);
+        }
+        win.webContents.send('client-rows-reply', rtrn);
+    }
+});
+
 //meal plan
 ipcMain.on('add-meal', (event, args) => {
     //remove any current diet
@@ -245,73 +271,60 @@ ipcMain.on('find-meal', (event, args) => {
         win.webContents.send('meal-find-reply', rtrn);
     });
 });
-//client page
-ipcMain.on('generate-client-rows', (event, args) => {
-    //get template to workwith
-    let filePath = path + '/template/client.html';
-    var template = fs.readFileSync(filePath, 'utf8');
-    let imgPath = process.env.HOMEPATH + '/Documents/Data/image';
-    //create row for each client
-    for (var i = 0; i < args.length; i++) {
-        var client = args[i];
-        var rtrn = {
-            html: template,
-            client: client
-        };
-        //my kickass template engine :)
-        for (var propertyName in client) {
-            rtrn.html = rtrn.html.replace('${' + propertyName + '}', client[propertyName]);
-        }
-        win.webContents.send('client-rows-reply', rtrn);
+
+
+
+
+
+
+//   this is where I am testing stuff out!!!!
+//   this is where I am testing stuff out!!!!
+//   this is where I am testing stuff out!!!!
+//   this is where I am testing stuff out!!!!
+//   this is where I am testing stuff out!!!!
+//   this is where I am testing stuff out!!!!
+//   this is where I am testing stuff out!!!!
+
+
+ipcMain.on('image-save', (event, args) => {
+    let options = {
+        filters: [
+            { name: 'Images', extensions: ['jpg', 'png', 'gif'] }
+        ]
     }
+    //callback for the open dialog window
+    let outerCallback = function (filePath) {
+        if (filePath && filePath.length > 0) {
+            let imgRaw = fs.readFileSync(filePath[0]);
+            let fileInfo = {
+                ext: path.extname(filePath[0]),
+                name: this._id,
+                newPath: imgPath,
+                img: imgRaw,
+                size: imgRaw.length
+            };
+
+            //callback for the image save
+            let innerCallback = (err) => {
+                var rtrn = {
+                    error: false,
+                    url: '',
+                    message: ''
+                };
+                if (!err) {
+                    rtrn.url = `${fileInfo.newPath}\\${fileInfo.name}${fileInfo.ext}`;
+                } else {
+                    rtrn.error = true;
+                    rtrn.message = err.message;
+                }
+                win.webContents.send('image-save-reply', rtrn);
+            }
+            fs.writeFile(`${fileInfo.newPath}\\${fileInfo.name}${fileInfo.ext}`, fileInfo.img, (innerCallback).bind(fileInfo));
+        }
+    }
+
+    dialog.showOpenDialog(null, options, (outerCallback).bind(args));
 });
-
-
-
-
-
-//   this is where I am testing stuff out!!!!
-//   this is where I am testing stuff out!!!!
-//   this is where I am testing stuff out!!!!
-//   this is where I am testing stuff out!!!!
-//   this is where I am testing stuff out!!!!
-//   this is where I am testing stuff out!!!!
-//   this is where I am testing stuff out!!!!
-
-
-
-
-
-
-
-
-//a little demo on how to use the showOpenDialog
-// ipcMain.on('show-save', (event, args) => {
-//     var options = {
-//         filters: [
-//             { name: 'Images', extensions: ['jpg', 'png', 'gif'] }
-//         ]
-//     }
-
-//     var x = function (filePath) {
-//         if (filePath.length > 0) {
-
-//             let i = {
-//                 ext: extention.extname(filePath[0]),
-//                 name: this.user,
-//                 newPath: app.getPath('client-image'),
-//                 img: fs.readFileSync(filePath[0])
-//             };
-
-//             fs.writeFile(`${i.newPath}/${i.name}${i.ext}`, i.img);
-//         }
-//     }
-
-//     dialog.showOpenDialog(null, options, (x).bind(args));
-
-
-
-// });
 
 
 //a little demo on how the show message works
