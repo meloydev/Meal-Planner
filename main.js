@@ -6,6 +6,7 @@ const setting = require('./settings');
 //local pathing
 const dbPath = `${process.env.USERPROFILE}\\Documents\\Data\\DataBase`;
 const imgPath = `${process.env.USERPROFILE}\\Documents\\Data\\image`;
+const documentPath = `${process.env.USERPROFILE}\\Documents\\Data\\PDF`;
 
 //database stuff
 var Datastore = require('nedb');
@@ -139,8 +140,18 @@ ipcMain.on('update-setting', (event, args) => {
     var update = { $set: { value: args.updatedValue } };
     var options = { upsert: true };
     var callBack = (err, doc) => {
-        console.log('Updated setting');
+        // if (!err) {
+        //     dialog.showMessageBox({ message: 'Setting has been updated', buttons: ['Create Word document', 'Create PDF', 'Continue', 'Cancel'] }, (e) => {
+        //         console.log('User selected: ' + e)
+        //         if (e === 0) {
+
+        //         }
+        //     });
+        // } else {
+        //     dialog.showErrorBox("File Save Error", err.message);
+        // }
     };
+    //runs the actual update
     db.update(query, update, options, callBack);
 });
 //searches by food that contains char in args
@@ -163,6 +174,46 @@ ipcMain.on('food-search-byId', (event, args) => {
 
 
 //client page
+ipcMain.on('image-save', (event, args) => {
+    let options = {
+        filters: [
+            { name: 'Images', extensions: ['jpg', 'png', 'gif'] }
+        ]
+    }
+    //callback for the open dialog window
+    let outerCallback = function (filePath) {
+        if (filePath && filePath.length > 0) {
+            let imgRaw = fs.readFileSync(filePath[0]);
+            let fileInfo = {
+                ext: path.extname(filePath[0]),
+                name: this._id,
+                newPath: imgPath,
+                img: imgRaw,
+                size: imgRaw.length
+            };
+
+            //callback for the image save
+            let innerCallback = (err) => {
+                var rtrn = {
+                    error: false,
+                    url: '',
+                    message: ''
+                };
+                if (!err) {
+                    rtrn.url = `${fileInfo.newPath}\\${fileInfo.name}${fileInfo.ext}`;
+                } else {
+                    dialog.showErrorBox("File Save Error", err.message);
+                    rtrn.error = true;
+                    rtrn.message = err.message;
+                }
+                win.webContents.send('image-save-reply', rtrn);
+            }
+            fs.writeFile(`${fileInfo.newPath}\\${fileInfo.name}${fileInfo.ext}`, fileInfo.img, (innerCallback).bind(fileInfo));
+        }
+    }
+
+    dialog.showOpenDialog(null, options, (outerCallback).bind(args));
+});
 ipcMain.on('add-client', (event, args) => {
     if (args.profileImage === "") {
         //put in default image 
@@ -173,6 +224,7 @@ ipcMain.on('add-client', (event, args) => {
         if (!err) {
             rtrn = { isError: false, item: doc };
         } else {
+            dialog.showErrorBox("File Save Error", err.message);
             rtrn = { isError: true, message: err };
         }
         win.webContents.send('client-add-reply', rtrn);
@@ -191,6 +243,7 @@ ipcMain.on('update-client', (event, args) => {
             if (!err) {
                 rtrn = { isError: false, message: 'Item updated successfully', client: args };
             } else {
+                dialog.showErrorBox("File Save Error", err.message);
                 rtrn = { isError: true, message: err };
             }
             //send response of update
@@ -202,13 +255,6 @@ ipcMain.on('all-client', (event, args) => {
         win.webContents.send('client-all-reply', doc);
     });
 });
-// ipcMain.on('one-client', (event, args) => {
-//     dbClient.find({ _id: args._id }, args, function (err, doc) {
-//         if (!err) {
-//             win.webContents.send('client-all-reply', doc);
-//         }
-//     });
-// });
 ipcMain.on('delete-client', (event, args) => {
     dbClient.remove({ _id: args }, function (err, doc) {
         var rtrn = {};
@@ -216,8 +262,7 @@ ipcMain.on('delete-client', (event, args) => {
             rtrn = { isError: false, id: args };
             win.webContents.send('client-remove-reply', rtrn);
         } else {
-            rtrn = { isError: true, message: err.message };
-            win.webContents.send('client-remove-reply', rtrn);
+            dialog.showErrorBox("File Save Error", err.message);
         }
     });
 });
@@ -247,13 +292,43 @@ ipcMain.on('add-meal', (event, args) => {
     dbMeal.remove({ client: args.client }, { multi: true });
     //add the new diet
     dbMeal.insert(args, function (err, doc) {
-        var rtrn = {};
         if (!err) {
-            rtrn = { isError: false, item: doc };
+            //callback for show message
+            let callBack = (e) => {
+                //doc is passed into the callback 
+                let mealPlan = doc;
+
+
+                //fs.writeFileSync(`${documentPath}\\MealPlan.json`, JSON.stringify(mealPlan));
+
+
+
+                console.log('User selected: ' + e)
+                switch (e) {
+                    case 0:
+                        console.log('Create Word Doc');
+                        break;
+                    case 1:
+                        console.log('Create PDF');
+                        break;
+                    case 2:
+                        console.log('Continue');
+                        break;
+                    default:
+                        console.log('Default');
+                        break;
+                }
+            }
+            //call show message
+            dialog.showMessageBox({
+                title: 'Options',
+                message: 'Meal plan has been successfully saved',
+                buttons: ['Create Word document', 'Create PDF', 'Close']
+            }, (callBack).bind(doc));
+
         } else {
-            rtrn = { isError: true, message: err };
+            dialog.showErrorBox("File Save Error", err.message);
         }
-        win.webContents.send('meal-add-reply', rtrn);
     });
 });
 
@@ -286,60 +361,7 @@ ipcMain.on('find-meal', (event, args) => {
 //   this is where I am testing stuff out!!!!
 
 
-ipcMain.on('image-save', (event, args) => {
-    let options = {
-        filters: [
-            { name: 'Images', extensions: ['jpg', 'png', 'gif'] }
-        ]
-    }
-    //callback for the open dialog window
-    let outerCallback = function (filePath) {
-        if (filePath && filePath.length > 0) {
-            let imgRaw = fs.readFileSync(filePath[0]);
-            let fileInfo = {
-                ext: path.extname(filePath[0]),
-                name: this._id,
-                newPath: imgPath,
-                img: imgRaw,
-                size: imgRaw.length
-            };
 
-            //callback for the image save
-            let innerCallback = (err) => {
-                var rtrn = {
-                    error: false,
-                    url: '',
-                    message: ''
-                };
-                if (!err) {
-                    rtrn.url = `${fileInfo.newPath}\\${fileInfo.name}${fileInfo.ext}`;
-                } else {
-                    rtrn.error = true;
-                    rtrn.message = err.message;
-                }
-                win.webContents.send('image-save-reply', rtrn);
-            }
-            fs.writeFile(`${fileInfo.newPath}\\${fileInfo.name}${fileInfo.ext}`, fileInfo.img, (innerCallback).bind(fileInfo));
-        }
-    }
-
-    dialog.showOpenDialog(null, options, (outerCallback).bind(args));
-});
-
-
-//a little demo on how the show message works
-// ipcMain.on('show-message', (event, args) => {
-//     var options = {
-//         type: 'info',
-//         title: 'this is the title!',
-//         detail: 'a little info here',
-//         message: 'you done messed up a a ron!',
-//         buttons: ['yes', 'no', 'help']
-//     };
-//     dialog.showMessageBox(null, options, (response) => {
-
-//     });
-// });
 
 
 

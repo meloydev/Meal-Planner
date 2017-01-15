@@ -169,21 +169,6 @@ ipcRenderer.on('modal-window-reply', (event, arg) => {
   var client = utilities.currentClient();
   $('#txtUserPopName').val(client.firstName + ' ' + client.lastName);
 });
-ipcRenderer.removeAllListeners('meal-add-reply');
-ipcRenderer.on('meal-add-reply', (event, arg) => {
-  var messageOptions = {
-    body: '',
-    title: ''
-  };
-  if (arg.isError) {
-    messageOptions.body = arg.message;
-    messageOptions.title = 'Error';
-  } else {
-    messageOptions.body = 'Complete';
-    messageOptions.title = 'Meal plan has been saved';
-  }
-  utilities.notify(messageOptions);
-});
 ipcRenderer.removeAllListeners('meal-find-reply');
 ipcRenderer.on('meal-find-reply', (event, arg) => {
   if (arg.isError) {
