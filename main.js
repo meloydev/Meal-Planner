@@ -3,18 +3,19 @@ const fs = require('fs');
 const path = require('path');
 const auth = require('./auth');
 const setting = require('./settings');
+const word = require('./custom_modules/word');
+const dal = require('./custom_modules/dal');
+
 //local pathing
 const dbPath = `${process.env.USERPROFILE}\\Documents\\Data\\DataBase`;
 const imgPath = `${process.env.USERPROFILE}\\Documents\\Data\\image`;
-const documentPath = `${process.env.USERPROFILE}\\Documents\\Data\\PDF`;
+const documentPath = `${process.env.USERPROFILE}\\Documents\\Data`;
 
 //database stuff
-var Datastore = require('nedb');
-var db = new Datastore({ filename: `${dbPath}\\setting.db`, autoload: true });
-var dbAdmin = new Datastore({ filename: `${dbPath}\\admin.db`, autoload: true });
-var dbFood = new Datastore({ filename: `${dbPath}\\food.db`, autoload: true });
-var dbClient = new Datastore({ filename: `${dbPath}\\client.db`, autoload: true });
+const Datastore = require('nedb');
 var dbMeal = new Datastore({ filename: `${dbPath}\\meal.db`, autoload: true });
+//set dal connections
+dal.connections(dbMeal);
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -60,17 +61,15 @@ app.on('activate', () => {
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
 ipcMain.on('login', function (event, args) {
-    dbAdmin.findOne({ userName: args.userName }, function (err, user) {
-        if (user !== null && user.userName === args.userName &&
-            user.passWord === args.passWord) {
+    dal.getAdminPromise(args)
+        .then(values => {
             let filePath = `${__dirname}/partial/dashboard.html`;
             var partial = fs.readFileSync(filePath, 'utf8');
             win.webContents.send('reply', partial);
-        } else {
-            //TODO..
-        }
-    });
-
+        })
+        .catch(err => {
+            dialog.showErrorBox('Error', 'No User Found!');
+        });
 });
 //These calls are from controls 
 //located on pages
@@ -113,26 +112,32 @@ ipcMain.on('modal-window', (event, args) => {
 
 //admin page
 ipcMain.on('add-food', (event, args) => {
-    dbFood.insert(args, function (err, doc) {
-        var rtrn = {};
-        if (!err) {
-            console.log('Inserted', doc.name, 'with ID', doc._id);
-            rtrn = { isError: false, message: 'Item saved successfully' };
-        } else {
-            rtrn = { isError: true, message: err };
-        }
-        win.webContents.send('meal-add-reply', rtrn);
-    });
+    dal.insertFoodPromise(args)
+        .then(values => {
+            win.webContents.send('meal-add-reply', { isError: false, message: 'Item saved successfully' });
+        })
+        .catch(err => {
+            dialog.showErrorBox('Error', err.message);
+        });
 });
 //these calls are to query the db
 ipcMain.on('find-setting', (event, args) => {
-    db.findOne({ label: args }, function (err, doc) {
-        win.webContents.send('return-setting', doc);
-    });
-    //get user defined CSS values
-    db.find({ label: 'css rule' }, function (err, doc) {
-        win.webContents.send('return-css', doc);
-    });
+
+    dal.getSettingPromise(args)
+        .then(values => {
+            win.webContents.send('return-setting', values);
+        })
+        .catch(err => {
+            dialog.showErrorBox('Error', err.message);
+        });
+
+    dal.getSettingsPromise('css rule')
+        .then(values => {
+            win.webContents.send('return-css', values);
+        })
+        .catch(err => {
+            dialog.showErrorBox('Error', err.message);
+        });
 });
 //update or insert a new setting
 ipcMain.on('update-setting', (event, args) => {
@@ -156,20 +161,23 @@ ipcMain.on('update-setting', (event, args) => {
 });
 //searches by food that contains char in args
 ipcMain.on('autocomplete-food-search', (event, args) => {
-    try {
-        var re = new RegExp(args, 'i');
-        dbFood.find({ name: re }, function (err, doc) {
-            win.webContents.send('food-search-result', doc);
+    dal.getFoodByDescriptionPromise(args)
+        .then(values => {
+            win.webContents.send('food-search-result', values);
+        })
+        .catch(err => {
+            dialog.showErrorBox('Error', err.message);
         });
-    } catch (e) {
-        console.log(e.message);
-    }
 });
 //returns one food item based on ID
 ipcMain.on('food-search-byId', (event, args) => {
-    dbFood.findOne({ '_id': args }, function (err, doc) {
-        win.webContents.send('food-search-byId-result', doc);
-    });
+    dal.getFoodByIdPromise(args)
+        .then(values => {
+            win.webContents.send('food-search-byId-result', values);
+        })
+        .catch(err => {
+            dialog.showErrorBox('Error', err.message);
+        });
 });
 
 
@@ -214,57 +222,54 @@ ipcMain.on('image-save', (event, args) => {
 
     dialog.showOpenDialog(null, options, (outerCallback).bind(args));
 });
-ipcMain.on('add-client', (event, args) => {
-    if (args.profileImage === "") {
+ipcMain.on('add-client', (event, client) => {
+    if (client.profileImage === "") {
         //put in default image 
-        args.profileImage = `${process.env.USERPROFILE}\\Documents\\Data\\Image\\holder.png`
+        client.profileImage = `${process.env.USERPROFILE}\\Documents\\Data\\Image\\holder.png`
     }
-    dbClient.insert(args, function (err, doc) {
-        var rtrn = {};
-        if (!err) {
-            rtrn = { isError: false, item: doc };
-        } else {
-            dialog.showErrorBox("File Save Error", err.message);
-            rtrn = { isError: true, message: err };
-        }
-        win.webContents.send('client-add-reply', rtrn);
-    });
+
+    dal.insertClientPromise(client)
+        .then(values => {
+            win.webContents.send('client-add-reply', { isError: false, item: values });
+        })
+        .catch(err => {
+            dialog.showErrorBox("Client Save Error", err.message);
+        });
 });
-ipcMain.on('update-client', (event, args) => {
-    if (args.profileImage === "") {
+ipcMain.on('update-client', (event, client) => {
+    if (client.profileImage === "") {
         //put in default image 
-        args.profileImage = `${process.env.USERPROFILE}\\Documents\\Data\\Image\\holder.png`
+        client.profileImage = `${process.env.USERPROFILE}\\Documents\\Data\\Image\\holder.png`
     }
-    dbClient.update(
-        { _id: args.id },
-        args,
-        function (err, numReplaced) {
-            var rtrn = {};
-            if (!err) {
-                rtrn = { isError: false, message: 'Item updated successfully', client: args };
-            } else {
-                dialog.showErrorBox("File Save Error", err.message);
-                rtrn = { isError: true, message: err };
-            }
-            //send response of update
-            win.webContents.send('client-update-reply', rtrn);
+    dal.updateClientPromise(client)
+        .then(values => {
+            win.webContents.send('client-update-reply', {
+                isError: false,
+                message: 'Item updated successfully',
+                client: values
+            });
+        })
+        .catch(err => {
+            dialog.showErrorBox("Client Save Error", err.message);
         });
 });
 ipcMain.on('all-client', (event, args) => {
-    dbClient.find({}).sort({ lastName: 1, firstName: 1 }).exec(function (err, doc) {
-        win.webContents.send('client-all-reply', doc);
-    });
+    dal.getClientsPromise()
+        .then(values => {
+            win.webContents.send('client-all-reply', values);
+        })
+        .catch(err => {
+            dialog.showErrorBox("File Save Error", err.message);
+        });
 });
 ipcMain.on('delete-client', (event, args) => {
-    dbClient.remove({ _id: args }, function (err, doc) {
-        var rtrn = {};
-        if (!err) {
-            rtrn = { isError: false, id: args };
-            win.webContents.send('client-remove-reply', rtrn);
-        } else {
-            dialog.showErrorBox("File Save Error", err.message);
-        }
-    });
+    dal.deleteClientPromise(args)
+        .then(values => {
+
+        })
+        .catch(err => {
+            dialog.showErrorBox("Client delete Error", err.message);
+        });
 });
 ipcMain.on('generate-client-rows', (event, args) => {
     //get template to workwith
@@ -288,63 +293,109 @@ ipcMain.on('generate-client-rows', (event, args) => {
 
 //meal plan
 ipcMain.on('add-meal', (event, args) => {
-    //remove any current diet
-    dbMeal.remove({ client: args.client }, { multi: true });
+    //remove any current diet 
+    dal.deleteMealPromise(args.client)
+        .then(values => {
+            dal.insertMealPromise(args)
+                .then(values => {
+
+                    let callBack = (e) => {
+                        if (e === 0) {
+                            let mealPlan = values;
+                            let clientPromise = dal.getClientPromise(mealPlan.client);
+                            let mealPromise = dal.getMealPlanPromise(dbMeal, mealPlan.client);
+                            Promise.all([clientPromise, mealPromise])
+                                .then(values => {
+                                    let mealPlanTemplate = `${documentPath}\\MealTemplate.docx`;
+                                    let saveLocation = `${app.getPath('documents')}\\test.docx`;
+                                    let clientData = {
+                                        client: values[0],
+                                        mealPlan: values[1]
+                                    }
+                                    word.saveMealAsDocx(clientData, mealPlanTemplate, saveLocation);
+                                })
+                                .catch(reason => {
+                                    dialog.showErrorBox("File Save Error", reason);
+                                });
+                        }
+                    };
+                    //call show message
+                    dialog.showMessageBox({
+                        title: 'Options',
+                        message: 'Meal plan has been successfully saved',
+                        buttons: ['Create Word document', 'Create PDF', 'Close']
+                    }, (callBack).bind(values));
+                })
+                .catch(err => {
+                    dialog.showErrorBox("File Save Error", err);
+                });
+        })
+        .catch(err => {
+            dialog.showErrorBox('Error', err.message);
+        });
+
+
     //add the new diet
-    dbMeal.insert(args, function (err, doc) {
-        if (!err) {
-            //callback for show message
-            let callBack = (e) => {
-                //doc is passed into the callback 
-                let mealPlan = doc;
+    // dbMeal.insert(args, function (err, doc) {
+    //     if (!err) {
+    //         //callback for show message
+    //         let callBack = (e) => {
+    //             //doc is passed into the callback 
+    //             let mealPlan = doc;
+    //             switch (e) {
+    //                 case 0:
+    //                     try {
+    //                         let clientPromise = dal.getClientPromise(mealPlan.client);
+    //                         let mealPromise = dal.getMealPlanPromise(dbMeal, mealPlan.client);
+    //                         Promise.all([clientPromise, mealPromise])
+    //                             .then(values => {
+    //                                 let mealPlanTemplate = `${documentPath}\\MealTemplate.docx`;
+    //                                 let saveLocation = `${app.getPath('documents')}\\test.docx`;
+    //                                 let clientData = {
+    //                                     client: values[0],
+    //                                     mealPlan: values[1]
+    //                                 }
+    //                                 word.saveMealAsDocx(clientData, mealPlanTemplate, saveLocation);
+    //                             })
+    //                             .catch(reason => {
+    //                                 dialog.showErrorBox("File Save Error", reason);
+    //                             });
+    //                     } catch (e) {
+    //                         dialog.showErrorBox("File Save Error", e.message);
+    //                     }
+    //                     break;
+    //                 case 1:
+    //                     console.log('Create PDF');
+    //                     break;
+    //                 case 2:
+    //                     console.log('Continue');
+    //                     break;
+    //                 default:
+    //                     console.log('Default');
+    //                     break;
+    //             }
+    //         }
+    //         //call show message
+    //         dialog.showMessageBox({
+    //             title: 'Options',
+    //             message: 'Meal plan has been successfully saved',
+    //             buttons: ['Create Word document', 'Create PDF', 'Close']
+    //         }, (callBack).bind(doc));
 
-
-                //fs.writeFileSync(`${documentPath}\\MealPlan.json`, JSON.stringify(mealPlan));
-
-
-
-                console.log('User selected: ' + e)
-                switch (e) {
-                    case 0:
-                        console.log('Create Word Doc');
-                        break;
-                    case 1:
-                        console.log('Create PDF');
-                        break;
-                    case 2:
-                        console.log('Continue');
-                        break;
-                    default:
-                        console.log('Default');
-                        break;
-                }
-            }
-            //call show message
-            dialog.showMessageBox({
-                title: 'Options',
-                message: 'Meal plan has been successfully saved',
-                buttons: ['Create Word document', 'Create PDF', 'Close']
-            }, (callBack).bind(doc));
-
-        } else {
-            dialog.showErrorBox("File Save Error", err.message);
-        }
-    });
+    //     } else {
+    //         dialog.showErrorBox("File Save Error", err.message);
+    //     }
+    // });
 });
 
 ipcMain.on('find-meal', (event, args) => {
-    //remove any current diet
-    dbMeal.findOne({ client: args.id }, (err, doc) => {
-        rtrn = {};
-        if (err) {
-            rtrn.isError = true;
-            rtrn.message = err.message;
-        } else {
-            rtrn.isError = false;
-            rtrn.meal = doc;
-        }
-        win.webContents.send('meal-find-reply', rtrn);
-    });
+    dal.getMealPlanPromise(args._id)
+        .then(values => {
+            win.webContents.send('meal-find-reply', { isError: false, meal: values });
+        })
+        .catch(err => {
+            dialog.showErrorBox("File Save Error", err.message);
+        });
 });
 
 
