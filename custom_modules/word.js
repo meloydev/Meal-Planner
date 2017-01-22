@@ -3,22 +3,26 @@ const Docxtemplater = require('docxtemplater');
 const JSZip = require('jszip');
 
 exports.saveMealAsDocx = (clientData, templateLocation, saveLocation) => {
+    return new Promise((res, rej) => {
+        //Load the docx file as a binary 
+        var content = fs.readFileSync(templateLocation, "binary");
 
-    //Load the docx file as a binary
-    var content = fs
-        .readFileSync(templateLocation, "binary");
+        var zip = new JSZip(content);
+        var doc = new Docxtemplater().loadZip(zip)
 
-    var zip = new JSZip(content);
-    var doc = new Docxtemplater().loadZip(zip)
+        //set the templateVariables
+        doc.setData(clientData.mealPlan);
 
-    //set the templateVariables
-    doc.setData(clientData.mealPlan);
+        //apply them (replace all occurences of {first_name} by Hipp, ...)
+        doc.render();
 
-    //apply them (replace all occurences of {first_name} by Hipp, ...)
-    doc.render();
+        var buf = doc.getZip()
+            .generate({ type: "nodebuffer" });
 
-    var buf = doc.getZip()
-        .generate({ type: "nodebuffer" });
-
-    fs.writeFileSync(saveLocation, buf);
+        fs.writeFileSync(saveLocation, buf);
+        //return the newly create files location for
+        //the main process to open
+        res(saveLocation);
+    });
 }
+

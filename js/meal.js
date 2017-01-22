@@ -100,7 +100,7 @@ var mealClick = {
     if (clientId) {
       mealSave.save(clientId);
     } else {
-      //TODO: somehow save a meal "Template (no client)"
+      ipcRenderer.send('show-ballon', { title: 'Error', content: 'No Client Selected' });
     }
   },
   load: function (meals) {

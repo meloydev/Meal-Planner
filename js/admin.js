@@ -4,8 +4,11 @@ $(document).ready(function () {
     $('#formAdd').off('submit').on('submit', submit.newFoodItem);
     $('#ddlReqLogin').off('change').on('change', adminChange.reqLogin);
     //change background color
-    var input = document.getElementById('colorPicker');
-    input.onchange = adminChange.color;
+    var primaryColor = document.getElementById('colorPicker');
+    primaryColor.onchange = adminChange.color;
+    //get defaults
+    ipcRenderer.send('find-setting', 'Require Login');
+    ipcRenderer.send('find-setting', 'css rule');
 });
 
 var adminChange = {
@@ -51,19 +54,15 @@ var submit = {
         ipcRenderer.send('add-food', data);
     }
 };
-ipcRenderer.removeAllListeners('meal-add-reply');
-ipcRenderer.on('meal-add-reply', (event, arg) => {
-    if (arg.isError) {
-        console.error(arg.message);
-        alert('Opps');
-    } else {
-        var mealAddForm = document.getElementById('formAdd');
-        mealAddForm.reset();
-        var messageOptions = {
-            body: 'Thank you!',
-            title: 'Food item added'
-        };
-        utilities.notify(messageOptions);
+ipcRenderer.removeAllListeners('return-setting');
+ipcRenderer.on('return-setting', (event, arg) => {
+    if (arg && arg.label === 'Require Login') {
+        $('#ddlReqLogin').val(arg.value.toString());
+    }
+    if (arg && arg.label === 'css rule') {
+        let cssRules = arg.value;
+        var primaryColor = document.getElementById('colorPicker');
+        primaryColor.value = cssRules.value;
     }
 });
 

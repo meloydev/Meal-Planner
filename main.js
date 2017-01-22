@@ -1,4 +1,4 @@
-const {app, BrowserWindow, ipcMain, dialog} = require('electron');
+const {app, Menu, Tray, BrowserWindow, ipcMain, dialog, shell} = require('electron');
 const fs = require('fs');
 const path = require('path');
 const auth = require('./auth');
@@ -6,35 +6,46 @@ const setting = require('./settings');
 const word = require('./custom_modules/word');
 const dal = require('./custom_modules/dal');
 
-//local pathing
-const dbPath = `${process.env.USERPROFILE}\\Documents\\Data\\DataBase`;
+//local pathing 
 const imgPath = `${process.env.USERPROFILE}\\Documents\\Data\\image`;
 const documentPath = `${process.env.USERPROFILE}\\Documents\\Data`;
-
-//database stuff
-const Datastore = require('nedb');
-var dbMeal = new Datastore({ filename: `${dbPath}\\meal.db`, autoload: true });
-//set dal connections
-dal.connections(dbMeal);
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let win;
+let tray = null;
 
 function createWindow() {
     // Create the browser window.
     win = new BrowserWindow(setting.window);
     // and load the index.html of the app.
-    win.loadURL(`file://${__dirname}/dashboard.html`)
-    // Open the DevTools.
-    //win.webContents.openDevTools(); 
-    // Emitted when the window is closed.
+    win.loadURL(`file://${__dirname}/dashboard.html`);
+
     win.on('closed', () => {
         // Dereference the window object, usually you would store windows
         // in an array if your app supports multi windows, this is the time
         // when you should delete the corresponding element.
         win = null
-    })
+    });
+
+    //tray menu
+    tray = new Tray(`${imgPath}//icon.png`);
+    tray.setToolTip('Meal Planner XL');
+    const contextMenu = Menu.buildFromTemplate([
+        { label: 'Maximize', type: 'normal', click: () => { win.maximize(); } },
+        { label: 'Minimize', type: 'normal', click: () => { win.minimize(); } },
+        {
+            label: 'Meals', type: 'normal', click: () => {
+                //this opens up users document folder, where
+                //program save diet .docx files
+                shell.showItemInFolder(`${app.getPath('documents')}\\test.text`);
+            }
+        },
+        { label: '', type: 'separator', click: () => { win.minimize(); } },
+        { label: 'Quit', type: 'normal', click: () => { app.quit(); } },
+        { label: 'Tools', type: 'normal', click: () => { win.webContents.openDevTools(); } },
+    ]);
+    tray.setContextMenu(contextMenu);
 }
 
 // This method will be called when Electron has finished
@@ -60,7 +71,7 @@ app.on('activate', () => {
 })
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
-ipcMain.on('login', function (event, args) {
+ipcMain.on('login', (event, args) => {
     dal.getAdminPromise(args)
         .then(values => {
             let filePath = `${__dirname}/partial/dashboard.html`;
@@ -79,11 +90,8 @@ ipcMain.on('navigate', (event, args) => {
         win.webContents.send('reply', data);
     });
 });
-//window functions
-ipcMain.on('tool', (event, args) => {
-    win.webContents.openDevTools();
-});
-ipcMain.on('close', function (event, args) {
+//window functions 
+ipcMain.on('close', (event, args) => {
     win.close();
 });
 ipcMain.on('min', (event, args) => {
@@ -109,18 +117,29 @@ ipcMain.on('modal-window', (event, args) => {
     });
 });
 
+ipcMain.on('show-ballon', (event, trayOptions) => {
+    tray.displayBalloon(trayOptions);
+});
+
+
 
 //admin page
 ipcMain.on('add-food', (event, args) => {
     dal.insertFoodPromise(args)
         .then(values => {
-            win.webContents.send('meal-add-reply', { isError: false, message: 'Item saved successfully' });
+            tray.displayBalloon({
+                title: 'Success',
+                content: 'Item has been saved'
+            });
         })
         .catch(err => {
-            dialog.showErrorBox('Error', err.message);
+            tray.displayBalloon({
+                title: 'Error',
+                content: err.message
+            });
         });
 });
-//these calls are to query the db
+//these calls are to query the settings DB
 ipcMain.on('find-setting', (event, args) => {
 
     dal.getSettingPromise(args)
@@ -141,23 +160,13 @@ ipcMain.on('find-setting', (event, args) => {
 });
 //update or insert a new setting
 ipcMain.on('update-setting', (event, args) => {
-    var query = { label: args.label };
-    var update = { $set: { value: args.updatedValue } };
-    var options = { upsert: true };
-    var callBack = (err, doc) => {
-        // if (!err) {
-        //     dialog.showMessageBox({ message: 'Setting has been updated', buttons: ['Create Word document', 'Create PDF', 'Continue', 'Cancel'] }, (e) => {
-        //         console.log('User selected: ' + e)
-        //         if (e === 0) {
-
-        //         }
-        //     });
-        // } else {
-        //     dialog.showErrorBox("File Save Error", err.message);
-        // }
-    };
-    //runs the actual update
-    db.update(query, update, options, callBack);
+    dal.updateSettingPromise(args)
+        .then((setting => {
+            win.webContents.send('return-setting', setting);
+        }))
+        .catch((err) => {
+            tray.displayBalloon({ title: 'Error', content: err.message });
+        });
 });
 //searches by food that contains char in args
 ipcMain.on('autocomplete-food-search', (event, args) => {
@@ -294,100 +303,47 @@ ipcMain.on('generate-client-rows', (event, args) => {
 //meal plan
 ipcMain.on('add-meal', (event, args) => {
     //remove any current diet 
-    dal.deleteMealPromise(args.client)
-        .then(values => {
-            dal.insertMealPromise(args)
-                .then(values => {
-
-                    let callBack = (e) => {
-                        if (e === 0) {
-                            let mealPlan = values;
-                            let clientPromise = dal.getClientPromise(mealPlan.client);
-                            let mealPromise = dal.getMealPlanPromise(dbMeal, mealPlan.client);
-                            Promise.all([clientPromise, mealPromise])
-                                .then(values => {
-                                    let mealPlanTemplate = `${documentPath}\\MealTemplate.docx`;
-                                    let saveLocation = `${app.getPath('documents')}\\test.docx`;
-                                    let clientData = {
-                                        client: values[0],
-                                        mealPlan: values[1]
-                                    }
-                                    word.saveMealAsDocx(clientData, mealPlanTemplate, saveLocation);
-                                })
-                                .catch(reason => {
-                                    dialog.showErrorBox("File Save Error", reason);
-                                });
-                        }
-                    };
-                    //call show message
-                    dialog.showMessageBox({
-                        title: 'Options',
-                        message: 'Meal plan has been successfully saved',
-                        buttons: ['Create Word document', 'Create PDF', 'Close']
-                    }, (callBack).bind(values));
-                })
-                .catch(err => {
-                    dialog.showErrorBox("File Save Error", err);
-                });
+    let deleteMeal = dal.deleteMealPromise(args.client);
+    deleteMeal.then(values => {
+        let insertMeal = dal.insertMealPromise(args)
+        insertMeal.then(values => {
+            //call show message
+            dialog.showMessageBox({
+                title: 'Options',
+                message: 'Meal plan has been successfully saved',
+                buttons: ['Create Word document', 'Create PDF', 'Close']
+            }, ((dialogOption) => {
+                if (dialogOption === 0) {
+                    let mealPlan = values;
+                    let clientPromise = dal.getClientPromise(mealPlan.client);
+                    let mealPromise = dal.getMealPlanPromise(mealPlan.client);
+                    Promise.all([clientPromise, mealPromise])
+                        .then(values => {
+                            let clientData = {
+                                client: values[0],
+                                mealPlan: values[1]
+                            }
+                            let mealPlanTemplate = `${documentPath}\\MealTemplate.docx`;
+                            let saveLocation = `${app.getPath('documents')}\\${clientData.client.firstName}_${clientData.client.lastName}.docx`;
+                            let wordSave = word.saveMealAsDocx(clientData, mealPlanTemplate, saveLocation);
+                            wordSave.then(fileLocation => {
+                                shell.openItem(fileLocation)
+                            });
+                        })
+                        .catch(reason => {
+                            dialog.showErrorBox("File Save Error", reason);
+                        });
+                }
+            }).bind(values));
         })
-        .catch(err => {
-            dialog.showErrorBox('Error', err.message);
+        insertMeal.catch(err => {
+            dialog.showErrorBox("File Save Error", err);
         });
-
-
-    //add the new diet
-    // dbMeal.insert(args, function (err, doc) {
-    //     if (!err) {
-    //         //callback for show message
-    //         let callBack = (e) => {
-    //             //doc is passed into the callback 
-    //             let mealPlan = doc;
-    //             switch (e) {
-    //                 case 0:
-    //                     try {
-    //                         let clientPromise = dal.getClientPromise(mealPlan.client);
-    //                         let mealPromise = dal.getMealPlanPromise(dbMeal, mealPlan.client);
-    //                         Promise.all([clientPromise, mealPromise])
-    //                             .then(values => {
-    //                                 let mealPlanTemplate = `${documentPath}\\MealTemplate.docx`;
-    //                                 let saveLocation = `${app.getPath('documents')}\\test.docx`;
-    //                                 let clientData = {
-    //                                     client: values[0],
-    //                                     mealPlan: values[1]
-    //                                 }
-    //                                 word.saveMealAsDocx(clientData, mealPlanTemplate, saveLocation);
-    //                             })
-    //                             .catch(reason => {
-    //                                 dialog.showErrorBox("File Save Error", reason);
-    //                             });
-    //                     } catch (e) {
-    //                         dialog.showErrorBox("File Save Error", e.message);
-    //                     }
-    //                     break;
-    //                 case 1:
-    //                     console.log('Create PDF');
-    //                     break;
-    //                 case 2:
-    //                     console.log('Continue');
-    //                     break;
-    //                 default:
-    //                     console.log('Default');
-    //                     break;
-    //             }
-    //         }
-    //         //call show message
-    //         dialog.showMessageBox({
-    //             title: 'Options',
-    //             message: 'Meal plan has been successfully saved',
-    //             buttons: ['Create Word document', 'Create PDF', 'Close']
-    //         }, (callBack).bind(doc));
-
-    //     } else {
-    //         dialog.showErrorBox("File Save Error", err.message);
-    //     }
-    // });
+    })
+    deleteMeal.catch(err => {
+        dialog.showErrorBox('Error', err.message);
+    });
 });
-
 ipcMain.on('find-meal', (event, args) => {
     dal.getMealPlanPromise(args._id)
         .then(values => {

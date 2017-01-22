@@ -4,11 +4,9 @@ const dbClient = new Datastore({ filename: `${dbPath}\\client.db`, autoload: tru
 var dbAdmin = new Datastore({ filename: `${dbPath}\\admin.db`, autoload: true });
 var dbSetting = new Datastore({ filename: `${dbPath}\\setting.db`, autoload: true });
 var dbFood = new Datastore({ filename: `${dbPath}\\food.db`, autoload: true });
-var dbMeal = null;
+var dbMeal = new Datastore({ filename: `${dbPath}\\meal.db`, autoload: true });
 
-exports.connections = (meal) => {
-    dbMeal = meal;
-}
+
 //Admin methods
 exports.getAdminPromise = (args) => {
     return new Promise((res, rej) => {
@@ -96,6 +94,23 @@ exports.insertClientPromise = (client) => {
             }
         });
     })
+}
+
+exports.updateSettingPromise = (args) => {
+    return new Promise((res, rej) => {
+        //query arguments
+        var query = { label: args.label };
+        var update = { $set: { value: args.updatedValue } };
+        var options = { upsert: true };
+        //run query
+        dbSetting.update(query, update, options, (err, data) => {
+            if (err) {
+                rej(err);
+            } else {
+                res(data)
+            }
+        });
+    });
 }
 
 exports.getSettingPromise = (args) => {
