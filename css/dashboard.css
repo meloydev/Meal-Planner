@@ -26,6 +26,10 @@
  td {
    text-overflow: ellipsis;
  }
+
+ textarea{
+    resize: none;
+}
  
  .header {
    background-color: var(--primary-color);

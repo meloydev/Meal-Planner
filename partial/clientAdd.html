@@ -40,30 +40,45 @@
                     <input class="form-control" name="postalCode" id="txtClientPostal" type="text" required />
                 </div>
             </div>
+            <div class="col-md-4">
+                <label for="isAdmin">Is Admin</label>
+                <select class="form-control" name="isAdmin" id="cbIsAdmin">
+                    <option value="true">True</option>
+                    <option value="false" selected>False</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label for="password">Password</label>
+                <input class="form-control" name="password" id="txtPassword" type="password" />
+            </div>
+            <div class="col-md-4">
+                <label for="confirm">Confirm Password</label>
+                <input class="form-control" name="confirm" id="txtConfirm" type="password" />
+            </div>
         </div>
         <div class="row">
             <div class="col-md-12">
                 <div class="form-group">
                     <label for="comment">Comments</label>
-                    <textarea id="txtUserPopComment" rows="4" class="form-control" name="comment" style="resize: none;" maxlength="100"></textarea>
-</div>
-</div>
-</div>
-
-<div class="row">
-    <div class="col-md-12">
-        <div class="form-group">
-            <div class="input-group">
-                <input type="text" class="form-control" name="profileImage" id="txtProfileImgUrl" placeholder="No profile image">
-                <span class="input-group-btn">
-                        <button id="btnAddClientImg" class="btn btn-default" type="button">Select</button>
-                    </span>
+                    <textarea id="txtUserPopComment" rows="4" class="form-control" name="comment" maxlength="100"></textarea>
+                </div>
             </div>
         </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <div class="input-group">
+                        <input type="text" class="form-control" name="profileImage" id="txtProfileImgUrl" placeholder="No profile image">
+                        <span class="input-group-btn">
+                        <button id="btnAddClientImg" class="btn btn-default" type="button">Select</button>
+                    </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
     </div>
-</div>
-
-
-</div>
-<button id="btnSubmitClient" type="submit" class="btn btn-primary">Submit</button>
+    <button id="btnSubmitClient" type="submit" class="btn btn-primary">Submit</button>
 </form>

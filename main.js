@@ -79,7 +79,11 @@ ipcMain.on('login', (event, args) => {
             win.webContents.send('reply', partial);
         })
         .catch(err => {
-            dialog.showErrorBox('Error', 'No User Found!');
+            tray.displayBalloon({
+                title: 'Error',
+                content: err.message
+            });
+            //dialog.showErrorBox('Error', err.message);
         });
 });
 //These calls are from controls 

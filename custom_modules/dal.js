@@ -1,22 +1,22 @@
 const dbPath = `${process.env.USERPROFILE}\\Documents\\Data\\DataBase`;
 const Datastore = require('nedb');
 const dbClient = new Datastore({ filename: `${dbPath}\\client.db`, autoload: true });
-var dbAdmin = new Datastore({ filename: `${dbPath}\\admin.db`, autoload: true });
 var dbSetting = new Datastore({ filename: `${dbPath}\\setting.db`, autoload: true });
 var dbFood = new Datastore({ filename: `${dbPath}\\food.db`, autoload: true });
 var dbMeal = new Datastore({ filename: `${dbPath}\\meal.db`, autoload: true });
 
-
 //Admin methods
 exports.getAdminPromise = (args) => {
     return new Promise((res, rej) => {
-        dbAdmin.findOne({ userName: args.userName }, function (err, user) {
-            if (user !== null && user.userName === args.userName &&
-                user.passWord === args.passWord) {
-                res(true);
-            } else {
-                rej(false);
-            }
+        dbClient.findOne({ email: args.email }, function (err, user) {
+            if (user === null || user.isAdmin === 'false')
+                return rej({ found: false, message: 'No User Found' });
+
+
+            if (user.password !== args.passWord)
+                return rej({ found: false, message: 'Incorrect Password' });
+
+            res({ found: true, message: 'User Found' });
         });
     })
 }

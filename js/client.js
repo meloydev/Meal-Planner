@@ -27,8 +27,15 @@ var clientClick = {
             var element = form[index];
             data[element.name] = element.value;
         }
-        //send to server
-        ipcRenderer.send('add-client', data);
+        let isValid = clientValidation.password();
+        if (isValid) {
+            ipcRenderer.send('add-client', data);
+        } else {
+            ipcRenderer.send('show-ballon', {
+                title: 'Error',
+                content: 'Password is required'
+            });
+        }
     },
     editClientItem: (e) => {
         e.preventDefault();
@@ -40,7 +47,17 @@ var clientClick = {
             var element = form[index];
             data[element.name] = element.value;
         }
-        ipcRenderer.send('update-client', data);
+
+        let isValid = clientValidation.password();
+        debugger;
+        if (isValid) {
+            ipcRenderer.send('update-client', data);
+        } else {
+            ipcRenderer.send('show-ballon', {
+                title: 'Error',
+                content: 'Password is Required'
+            });
+        }
     },
     delete: (e) => {
         let client = e.data;
@@ -69,6 +86,21 @@ var clientClick = {
         ipcRenderer.send('image-save', client);
     }
 };
+
+var clientValidation = {
+    password: () => {
+        let cbAdmin = document.getElementById('cbIsAdmin');
+        let isAdmin = (cbAdmin.value === 'true');
+        if (!isAdmin)
+            return true;
+
+        let password = document.getElementById('txtPassword');
+        let confirm = document.getElementById('txtConfirm');
+        //password and confirm is required and must match
+        let length = password.value.length + confirm.value.length;
+        return (length > 0 && password.value === confirm.value)
+    }
+}
 
 // Listen for async-reply message from main process
 ipcRenderer.removeAllListeners('modal-window-reply');
@@ -107,9 +139,9 @@ ipcRenderer.on('modal-window-reply', (event, arg) => {
         //send add command
         $('#btnSubmitClient').off('click').click(clientClick.newClientItem);
         //TODO: adding image to NEW client
-        let ma = Math.random() * 100;
-        console.info(ma);
-        //$('#btnAddClientImg').click(client, clientClick.image);
+        // let ma = Math.random() * 100;
+        // console.info(ma);
+        // $('#btnAddClientImg').click(client, clientClick.image);
     }
 
 });
