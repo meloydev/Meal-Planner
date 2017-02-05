@@ -5,6 +5,7 @@ const auth = require('./auth');
 const setting = require('./settings');
 const word = require('./custom_modules/word');
 const dal = require('./custom_modules/dal');
+const util = require('./custom_modules/util');
 
 //local pathing 
 const imgPath = `${process.env.USERPROFILE}\\Documents\\Data\\image`;
@@ -195,45 +196,32 @@ ipcMain.on('food-search-byId', (event, args) => {
 
 
 //client page
-ipcMain.on('image-save', (event, args) => {
-    let options = {
-        filters: [
-            { name: 'Images', extensions: ['jpg', 'png', 'gif'] }
-        ]
-    }
-    //callback for the open dialog window
-    let outerCallback = function (filePath) {
-        if (filePath && filePath.length > 0) {
-            let imgRaw = fs.readFileSync(filePath[0]);
-            let fileInfo = {
-                ext: path.extname(filePath[0]),
-                name: this._id,
-                newPath: imgPath,
-                img: imgRaw,
-                size: imgRaw.length
-            };
+ipcMain.on('profile-image-save', (event, args) => {
+    util.openDialogPromise(args)
+        .then(dialogReturn => {
+            util.readFilePromise(dialogReturn.image)
+                .then(imgRaw => {
+                    //let imgRaw = fs.readFileSync(dialogReturn.image);
+                    let ext = path.extname(dialogReturn.image);
+                    let writeTo = `${imgPath}\\Profile\\${dialogReturn.client._id}${ext}`;
 
-            //callback for the image save
-            let innerCallback = (err) => {
-                var rtrn = {
-                    error: false,
-                    url: '',
-                    message: ''
-                };
-                if (!err) {
-                    rtrn.url = `${fileInfo.newPath}\\${fileInfo.name}${fileInfo.ext}`;
-                } else {
+                    //saves the new image to disk with 
+                    //clients id as filename
+                    util.saveImagePromise(writeTo, imgRaw)
+                        .then(value => {
+                            win.webContents.send('image-save-reply', value);
+                        })
+                        .catch(value => {
+                            dialog.showErrorBox("File Save Error", value.message);
+                        });
+                })
+                .catch(err => {
                     dialog.showErrorBox("File Save Error", err.message);
-                    rtrn.error = true;
-                    rtrn.message = err.message;
-                }
-                win.webContents.send('image-save-reply', rtrn);
-            }
-            fs.writeFile(`${fileInfo.newPath}\\${fileInfo.name}${fileInfo.ext}`, fileInfo.img, (innerCallback).bind(fileInfo));
-        }
-    }
-
-    dialog.showOpenDialog(null, options, (outerCallback).bind(args));
+                });
+        })
+        .catch(err => {
+            dialog.showErrorBox("File Save Error", err.message);
+        });
 });
 ipcMain.on('add-client', (event, client) => {
     if (client.profileImage === "") {
@@ -243,7 +231,9 @@ ipcMain.on('add-client', (event, client) => {
 
     dal.insertClientPromise(client)
         .then(values => {
-            win.webContents.send('client-add-reply', { isError: false, item: values });
+            fs.mkdir(`${imgPath}\\${values._id}`, () => {
+                win.webContents.send('client-add-reply', { isError: false, item: values });
+            });
         })
         .catch(err => {
             dialog.showErrorBox("Client Save Error", err.message);
@@ -288,7 +278,7 @@ ipcMain.on('generate-client-rows', (event, args) => {
     //get template to workwith
     let filePath = `${__dirname}/template/client.html`;
     var template = fs.readFileSync(filePath, 'utf8');
-    let imgPath = process.env.ProgramData; + '/image';
+
     //create row for each client
     for (var i = 0; i < args.length; i++) {
         var client = args[i];
@@ -358,6 +348,106 @@ ipcMain.on('find-meal', (event, args) => {
         });
 });
 
+//progress/image page
+ipcMain.on('dialog-open', (event, args) => {
+    util.openDialogAllowMultiplePromise(args)
+        .then(dialogReturn => {
+            var image = {
+                first: dialogReturn.image.safeElement(0),
+                second: dialogReturn.image.safeElement(1),
+                third: dialogReturn.image.safeElement(2)
+            };
+            win.webContents.send('dialog-open-reply', image);
+        })
+        .catch(err => {
+            dialog.showErrorBox("File Save Error", err.message);
+        });
+});
+
+ipcMain.on('progress-image-save', (event, args) => {
+    var d = new Date(args.info.date);
+    var newDir = `${imgPath}\\${args.client._id}\\${d.getMonth() + 1}_${d.getDate()}_${d.getFullYear()}`;
+    //make a directory for new images
+    util.mkmDirPromise(newDir)
+        .then(value => {
+            let files = args.info.images;
+            //get all files
+            let promises = [
+                util.readFilePromise(files[0]),
+                util.readFilePromise(files[1]),
+                util.readFilePromise(files[2])
+            ];
+            //when all promises return
+            Promise.all(promises)
+                .then(value => {
+                    let savePromises = [];
+                    for (var i = 0; i < value.length; i++) {
+                        let ext = path.extname(args.info.images[i]);
+
+                        args.info.images[i] = `${newDir}\\${i}${ext}`
+
+
+                        let saveP = util.saveImagePromise(args.info.images[i], value[i]);
+                        savePromises.push(saveP);
+                    }
+
+                    Promise.all(savePromises)
+                        .then(value => {
+                            //insert record into DB
+                            dal.insertImagePromise(args.info)
+                                .then(value => {
+                                    win.webContents.send('progress-add-reply', { isError: false, item: value });
+                                })
+                                .catch(err => {
+                                    dialog.showErrorBox("Save Error", err.message);
+                                });
+                        });
+                })
+                .catch(err => {
+                    dialog.showErrorBox("Save Error", err.message);
+                });
+
+
+
+
+
+
+        })
+        .catch(err => {
+            dialog.showErrorBox("Save Error", err.message);
+        });
+});
+
+ipcMain.on('find-progress', (event, args) => {
+    dal.getProgressPromise(args.id)
+        .then(values => {
+            win.webContents.send('find-progress-reply', { isError: false, progress: values });
+        })
+        .catch(err => {
+            dialog.showErrorBox("File Save Error", err.message);
+        });
+});
+
+ipcMain.on('generate-client-progress-row', (event, args) => {
+    //get template to workwith
+    let filePath = `${__dirname}/template/clientImage.html`;
+    var template = fs.readFileSync(filePath, 'utf8');
+
+    //create row for each client
+    for (var i = 0; i < args.length; i++) {
+        var progress = args[i];
+        var rtrn = {
+            html: template,
+            progress: progress,
+            images: args[i].images
+        };
+        //my kickass template engine :)
+        for (var propertyName in progress) {
+            rtrn.html = rtrn.html.replace('${' + propertyName + '}', progress[propertyName]);
+        }
+        win.webContents.send('find-progress-row', rtrn);
+    }
+});
 
 
 
@@ -370,8 +460,13 @@ ipcMain.on('find-meal', (event, args) => {
 //   this is where I am testing stuff out!!!!
 //   this is where I am testing stuff out!!!!
 //   this is where I am testing stuff out!!!!
-
-
+Array.prototype.safeElement = function (e) {
+    if (this.length >= e + 1) {
+        return this[e];
+    } else {
+        return null;
+    }
+};
 
 
 

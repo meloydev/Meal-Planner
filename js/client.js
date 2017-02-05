@@ -49,7 +49,6 @@ var clientClick = {
         }
 
         let isValid = clientValidation.password();
-        debugger;
         if (isValid) {
             ipcRenderer.send('update-client', data);
         } else {
@@ -68,10 +67,13 @@ var clientClick = {
     },
     meal: (e) => {
         var selectedClient = e.data;
-        //set client "Session"
-        //localStorage.setItem('SELECTED-CLIENT', JSON.stringify(selectedClient));
         utilities.setCurrentClient(selectedClient);
         ipcRenderer.send('navigate', 'meal');
+    },
+    images: (e) => {
+        var selectedClient = e.data;
+        utilities.setCurrentClient(selectedClient);
+        ipcRenderer.send('navigate', 'image');
     },
     edit: (e) => {
         ipcRenderer.send('modal-window',
@@ -83,7 +85,7 @@ var clientClick = {
     },
     image: (e) => {
         let client = e.data;
-        ipcRenderer.send('image-save', client);
+        ipcRenderer.send('profile-image-save', client);
     }
 };
 
@@ -213,6 +215,7 @@ ipcRenderer.on('client-rows-reply', (event, arg) => {
         //set row actions
         row.find('.clientEdit').click(arg.client, clientClick.edit);
         row.find('.clientMeal').click(arg.client, clientClick.meal);
+        row.find('.clientImage').click(arg.client, clientClick.images);
         row.hide().appendTo(tbl).fadeIn(1000);
     }
 });
@@ -222,7 +225,7 @@ ipcRenderer.on('image-save-reply', (event, arg) => {
     if (arg.isError) {
         utilities.notify(arg.message);
     } else {
-        $('#txtProfileImgUrl').val(arg.url);
+        $('#txtProfileImgUrl').val(arg);
     }
 });
 

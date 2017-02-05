@@ -1,0 +1,41 @@
+<form action="POST" role="form" id="formAddClient">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="imageDate">Date</label>
+                    <input class="form-control" name="imageDate" id="txtimageDate" type="date" required />
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="bmi">BMI</label>
+                    <input class="form-control" name="bmi" id="txtbmi" type="number" required />
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <div class="input-group">
+                        <input id="btnImgDialog" type="file" style="display: none" multiple="multiple">
+                        <input type="text" class="form-control" name="image" id="txtImgUrl" placeholder="Select Up to 3 images">
+                        <span class="input-group-btn">
+                        <button id="btnAddImg" class="btn btn-default" type="button">Select</button>
+                    </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label for="comment">Comments</label>
+                    <textarea id="txtImageComment" rows="4" class="form-control" name="comment" maxlength="200"></textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+    <button id="btnSubmitImage" type="button" class="btn btn-primary">Submit</button>
+</form>

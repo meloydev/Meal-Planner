@@ -4,6 +4,7 @@ const dbClient = new Datastore({ filename: `${dbPath}\\client.db`, autoload: tru
 var dbSetting = new Datastore({ filename: `${dbPath}\\setting.db`, autoload: true });
 var dbFood = new Datastore({ filename: `${dbPath}\\food.db`, autoload: true });
 var dbMeal = new Datastore({ filename: `${dbPath}\\meal.db`, autoload: true });
+var dbImage = new Datastore({ filename: `${dbPath}\\image.db`, autoload: true });
 
 //Admin methods
 exports.getAdminPromise = (args) => {
@@ -196,6 +197,42 @@ exports.deleteMealPromise = (clientId) => {
             }
         });
     })
+}
+
+exports.valuePromise = (value) => {
+    return new Promise((res, rej) => {
+        if (value) {
+            res(value);
+        } else {
+            rej();
+        }
+    });
+}
+
+//progress methods
+exports.insertImagePromise = (client) => {
+    return new Promise((res, rej) => {
+        dbImage.insert(client, function (err, data) {
+            if (err) {
+                rej(err);
+            } else {
+                res(data);
+            }
+        });
+    });
+}
+
+exports.getProgressPromise = (id) => {
+    return new Promise((res, rej) => {
+        dbImage.find({ clientId: id }, (err, data) => {
+            if (err) {
+                rej(err);
+            }
+            else {
+                res(data);
+            }
+        });
+    });
 }
 
 

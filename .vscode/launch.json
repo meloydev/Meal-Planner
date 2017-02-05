@@ -12,16 +12,16 @@
             "preLaunchTask": null,
             "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/electron.cmd",
             "runtimeArgs": [
-                "--enable-loggin"
+                "--enable-loggin --disable-http-cache"
             ],
             "env": {
                 "NODE_ENV": "development"
             },
             "console": "internalConsole",
             "sourceMaps": false,
-            "outDir": null 
+            "outDir": null
         },
-         {
+        {
             "name": "Debug",
             "type": "chrome",
             "request": "launch",
@@ -41,7 +41,7 @@
             },
             "console": "internalConsole",
             "sourceMaps": false,
-            "outDir": null 
+            "outDir": null
         },
         {
             "name": "Attach",

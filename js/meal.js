@@ -178,6 +178,12 @@ ipcRenderer.on('meal-find-reply', (event, arg) => {
     }
     utilities.notify(messageOptions);
   } else {
-    mealClick.load(arg.meal);
+    if (arg.meal) {
+      mealClick.load(arg.meal);
+    } else {
+      var client = utilities.currentClient();
+      var message = `No meal plan associated with ${client.firstName} ${client.lastName}`;
+      ipcRenderer.send('show-ballon', { title: 'Note', content: message });
+    }
   }
 });

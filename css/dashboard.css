@@ -1,5 +1,6 @@
  :root {
-   --primary-color: #00BCD4
+   --primary-color: #00BCD4;
+   --text-color: #757575;
  }
  
  html, body {
@@ -20,7 +21,7 @@
  }
  
  p {
-   color: #757575;
+   color: var(--text-color);
  }
  
  td {

@@ -28,3 +28,13 @@
     font-size:20.8px;
 }
 
+    input[type="color"]{
+      opacity: 0;
+      width: 0;
+      margin: 0;
+    }
+
+    .colorPicker{
+        color:var(--primary-color);
+        cursor: pointer;
+    }
