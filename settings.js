@@ -8,7 +8,8 @@ module.exports = {
         title: "Total Body Fitness",
         webPreferences: {
             devTools: true,
-            webSecurity: false
+            webSecurity: false,
+            experimentalFeatures: true
         }
     }
 }
