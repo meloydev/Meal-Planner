@@ -3,7 +3,7 @@
         <img src="${profileImage}" alt="" class="profileImage">
         <div>${firstName} ${lastName}</div>
     </td>
-    <td>
+    <td class="middle-align">
         <div class="client-address">
             <div>${address}</div>
             <div>${city}</div>
@@ -11,10 +11,12 @@
             <div>${postalCode}</div>
         </div>
     </td>
-    <td>
+    <td class="middle-align">
         <div class="client-contact">
-            <div><span class="fa fa-phone"></span> ${phone}</div>
-            <div><span class="fa fa-envelope"></span> ${email}</div>
+            <div><span class="fa fa-phone default" style="padding:15px"></span>${phone}</div>
+            <div><span class="fa fa-envelope default" style="padding:15px"></span>
+                <a style="color:blue;text-decoration: underline !important;" href="mailto:${email}">${email}</a>
+            </div>
         </div>
     </td>
     <td class="client-actions">
@@ -33,12 +35,17 @@
                 <i class="fa fa-camera-retro"></i>
             </a>
         </div>
+        <div class="clientDelete">
+            <a href="#">
+                <i class="fa fa-trash"></i>
+            </a>
+        </div>
     </td>
 </tr>
 <tr>
     <td colspan="4">
         <div class="client-comments">
-            <span class="fa fa-comment ico"></span> ${comment}
+            <span class="client-comments-title">Comments</span> ${comment}
         </div>
     </td>
 </tr>

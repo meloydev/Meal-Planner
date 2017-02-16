@@ -16,6 +16,7 @@ const documentPath = `${process.env.USERPROFILE}\\Documents\\Data`;
 let win;
 let tray = null;
 
+
 function createWindow() {
     // Create the browser window.
     win = new BrowserWindow(setting.window);
@@ -266,9 +267,13 @@ ipcMain.on('all-client', (event, args) => {
         });
 });
 ipcMain.on('delete-client', (event, args) => {
-    dal.deleteClientPromise(args)
+    dal.deleteClientPromise(args._id)
         .then(values => {
-
+            win.webContents.send('client-delete-reply', {
+                isError: false,
+                message: 'Client removed successfully',
+                client: args
+            });
         })
         .catch(err => {
             dialog.showErrorBox("Client delete Error", err.message);
@@ -288,6 +293,7 @@ ipcMain.on('generate-client-rows', (event, args) => {
         };
         //my kickass template engine :)
         for (var propertyName in client) {
+            rtrn.html = rtrn.html.replace('${' + propertyName + '}', client[propertyName]);
             rtrn.html = rtrn.html.replace('${' + propertyName + '}', client[propertyName]);
         }
         win.webContents.send('client-rows-reply', rtrn);
@@ -365,29 +371,34 @@ ipcMain.on('dialog-open', (event, args) => {
 });
 
 ipcMain.on('progress-image-save', (event, args) => {
-    var d = new Date(args.info.date);
+    var d = new Date(args.info.imageDate);
     var newDir = `${imgPath}\\${args.client._id}\\${d.getMonth() + 1}_${d.getDate()}_${d.getFullYear()}`;
     //make a directory for new images
     util.mkmDirPromise(newDir)
         .then(value => {
-            let files = args.info.images;
+            let files = args.info.images.split(';');
             //get all files
-            let promises = [
-                util.readFilePromise(files[0]),
-                util.readFilePromise(files[1]),
-                util.readFilePromise(files[2])
-            ];
+            let promises = [];
+
+            for (var x = 0; x < files.length; x++) {
+                let f = files[x];
+                if (f && f.length > 5) {
+                    var p = util.readFilePromise(f);
+                    promises.push(p);
+                }
+            }
+
             //when all promises return
             Promise.all(promises)
                 .then(value => {
                     let savePromises = [];
                     for (var i = 0; i < value.length; i++) {
-                        let ext = path.extname(args.info.images[i]);
+                        let ext = path.extname(files[i]);
 
-                        args.info.images[i] = `${newDir}\\${i}${ext}`
+                        files[i] = `${newDir}\\${i}${ext}`
 
 
-                        let saveP = util.saveImagePromise(args.info.images[i], value[i]);
+                        let saveP = util.saveImagePromise(files[i], value[i]);
                         savePromises.push(saveP);
                     }
 
@@ -406,12 +417,6 @@ ipcMain.on('progress-image-save', (event, args) => {
                 .catch(err => {
                     dialog.showErrorBox("Save Error", err.message);
                 });
-
-
-
-
-
-
         })
         .catch(err => {
             dialog.showErrorBox("Save Error", err.message);
@@ -436,6 +441,8 @@ ipcMain.on('generate-client-progress-row', (event, args) => {
     //create row for each client
     for (var i = 0; i < args.length; i++) {
         var progress = args[i];
+        var d = new Date(progress.imageDate);
+        progress.formattedDate = `${d.getMonth() + 1}-${d.getDate()}-${d.getFullYear()}`;
         var rtrn = {
             html: template,
             progress: progress,
@@ -448,6 +455,8 @@ ipcMain.on('generate-client-progress-row', (event, args) => {
         win.webContents.send('find-progress-row', rtrn);
     }
 });
+
+
 
 
 
@@ -467,6 +476,13 @@ Array.prototype.safeElement = function (e) {
         return null;
     }
 };
+
+
+// function test() {
+//     fs.unlink(`${imgPath}\\test.txt`, (err) => {
+//         debugger;
+//     });
+// }
 
 
 

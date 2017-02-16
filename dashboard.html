@@ -12,14 +12,13 @@
 	<script>
 		window.$ = window.jQuery = require('./js/jquery.min.js');
 	</script>
-<script src="./js/bootstrap.js"></script>
-<script src="./js/dashboard.js"></script>
+	<script src="./js/bootstrap.js"></script>
+	<script src="./js/dashboard.js"></script>
 </head>
 
 <body>
 	<div class="header">
-		<span class="tools">
-			<!--<i class="fa fa-wrench" aria-hidden="true"></i>-->
+		<span class="tools"> 
 			<i id= "btnHome" class="fa fa-home fa-2x" aria-hidden="true"></i>
 		</span>
 		<div class="user-name">
@@ -31,42 +30,42 @@
 <i class="fa fa-window-maximize" aria-hidden="true"></i>
 <i class="fa fa-window-close-o" aria-hidden="true"></i>
 </span>
-
-<!--nav-->
-
-<div class="dashboard-links-container">
-	<h3 data-location="measure" id="btnMeasure" class="dashboad-link slide">Measurements</h3>
-	<h3 data-location="meal" id="btnMeal" class="dashboad-links slide">Meal Planner</h3>
-	<h3 data-location="client" id="btnClient" class="dashboad-links slide">Clients</h3>
-	<h3 data-location="admin" id="btnSetting" class="dashboad-links slide">Admin</h3>
-</div>
-
-</div>
-<div>
-
-</div>
-<div class="container" id="mainContent">
-	<link href="css/loading.css" rel="stylesheet">
-</div>
-
-<!--modal-->
-<div class="modal fade" tabindex="-1" role="dialog" id="modal-window">
-	<div class="modal-dialog" role="document">
-		<div class="modal-content">
-			<div class="modal-header">
-				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+		<!--nav-->
+		<div class="dashboard-links-container">
+			<h3 data-location="measure" id="btnMeasure" class="dashboad-link slide">Measurements</h3>
+			<h3 data-location="meal" id="btnMeal" class="dashboad-links slide">Meal Planner</h3>
+			<h3 data-location="client" id="btnClient" class="dashboad-links slide">Clients</h3>
+			<h3 data-location="admin" id="btnSetting" class="dashboad-links slide">Admin</h3>
+		</div>
+	</div>
+	<div>
+	</div>
+	<div class="container" id="mainContent">
+		<link href="css/loading.css" rel="stylesheet">
+	</div>
+	<!--modal-->
+	<div class="modal fade" tabindex="-1" role="dialog" id="modal-window">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 						<span aria-hidden="true">&times;</span>
 					</button>
-				<h4 class="modal-title">Modal title here!</h4>
-			</div>
-			<div class="modal-body">
+					<h4 class="modal-title">Modal title here!</h4>
+				</div>
+				<div class="modal-body">
 
+				</div>
 			</div>
+			<!-- /.modal-content -->
 		</div>
-		<!-- /.modal-content -->
+		<!-- /.modal-dialog -->
 	</div>
-	<!-- /.modal-dialog -->
-</div>
 </body>
+
+<!--back-->
+<!--<div class="browse-back">
+	<i class="fa fa-3x fa-chevron-left" aria-hidden="true"></i>
+</div>-->
 
 </html>

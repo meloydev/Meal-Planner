@@ -50,14 +50,16 @@ exports.getMealPlanPromise = (clientId) => {
 
 exports.getClientsPromise = () => {
     return new Promise((res, rej) => {
-        dbClient.find({}).sort({ lastName: 1, firstName: 1 }).exec(function (err, data) {
-            if (err) {
-                rej(err);
-            }
-            else {
-                res(data);
-            }
-        });
+        dbClient.find({})
+            .sort({ lastName: 1, firstName: 1 })
+            .exec((err, data) => {
+                if (err) {
+                    rej(err);
+                }
+                else {
+                    res(data);
+                }
+            });
     })
 }
 
@@ -224,14 +226,16 @@ exports.insertImagePromise = (client) => {
 
 exports.getProgressPromise = (id) => {
     return new Promise((res, rej) => {
-        dbImage.find({ clientId: id }, (err, data) => {
-            if (err) {
-                rej(err);
-            }
-            else {
-                res(data);
-            }
-        });
+        dbImage.find({ clientId: id })
+            .sort({ date: 1 })
+            .exec((err, data) => {
+                if (err) {
+                    rej(err);
+                }
+                else {
+                    res(data);
+                }
+            });
     });
 }
 

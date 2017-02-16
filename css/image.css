@@ -52,19 +52,22 @@
    bottom: 25px;
    right: 25px;
  }
-
- .image-info{
-     width:75%;
-     margin:0 auto;
- }
- 
- 
-/*This is for the template*/
+  
+/*This is for the template*/ 
+.card-container{
+  width:90%; 
+  margin: 10px auto;
+   box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+   position: relative; 
+}
+.card-header{
+  padding:10px;
+}
 .template-container{
   display:flex;
   flex-direction: row;
   flex-wrap: nowrap;
-  justify-content: center;
+  justify-content: center;  
 }
 .template-item{
   height: 200px;
@@ -72,10 +75,51 @@
   background-color: var(--primary-color);
   margin: 25px;
   box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  transition: 300ms;
+  border-radius: 50%;
+  overflow: hidden;
 }
 .template-item img{
   height:100%;
-  width:100%;
+  width:100%; 
+}
+.template-item:hover{
+   transform: scale(1.3);
+   border-radius: 6px;
+}
+.card-date{
+  position: absolute;
+  top:5px;
+  left:5px;
+  font-size: 1.2em;
+  color:var(--primary-color);
+  border:1px solid;
+  padding:5px;
+  border-radius: 6px;
+}
+.card-bmi{
+ position: absolute;
+  top:5px;
+  right:5px;
+  font-size: 1.2em;
+  color:var(--primary-color);
+   border:1px solid;
+  padding:5px;
+  border-radius: 6px;
+}
+.card-comment{
+  background-color: var(--primary-color);
+  padding: 15px;
+  font-size: 1.5em;
+  color:#fff;
+  min-height: 150px;
+}
+.card-comment h3{
+  text-decoration: underline;
+}
+.card-comment-para{
+  width: 95%;
+  margin: 0 auto;
 }
 
 .no-image{
@@ -87,3 +131,17 @@
   font-size: 2em;
   color:#fff;
 }
+
+ @media screen and (max-width: 720px) { 
+    .template-item{
+      height: 150px;
+      width: 150px;
+    } 
+ }
+
+ @media screen and (max-width: 600px) { 
+    .template-item{
+      height: 100px;
+      width: 100px;
+    } 
+ }

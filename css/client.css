@@ -94,9 +94,10 @@
 
  /*this is the rows*/
     .profileImage{ 
-        height:200px;
-        width:200px; 
-        margin: 0 auto;
+        height:225px;
+        width:225px; 
+        margin: 10px auto;
+        border-radius: 50%;
     }
     .clientName{
         text-align: center;
@@ -131,13 +132,27 @@
       padding:15px;
       border-top: 1px solid #2c3e50;
       border-bottom: 1px solid #2c3e50;
+      font-size: .8em;
+      font-style: italic;
+      position :relative;
+    }
+    .client-comments-title{ 
+      background-color: #fff;
+      position :absolute;
+      top:-22px;
+      left:0;
+      padding-right:15px;
+      font-size: 1.4em;
+      font-style: normal;
     }
     .ico{
       position: relative;
       top:-15px;
       left:-15px;
     }
- 
+ .main-table .middle-align{
+   vertical-align: middle;
+ }
     @media (min-width: 768px) {
      .modal-dialog{
        width:80%;
@@ -146,4 +161,4 @@
      } 
     }
      
-   
+ 

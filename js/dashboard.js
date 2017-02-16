@@ -4,18 +4,19 @@ const electron = require('electron');
 const {ipcRenderer} = electron;
 
 $(document).ready(function () {
-    $('#btnClose').click(click.close);
-    $('[data-location]').click(click.navigate);
+    $('#btnClose').click(dashClick.close);
+    $('[data-location]').click(dashClick.navigate);
     //window functions
-    $('.fa-wrench').click(click.tool);
-    $('.fa-window-minimize').click(click.minimize);
-    $('.fa-window-maximize').click(click.maximize);
-    $('.fa-window-close-o').click(click.close);
-    $('#btnHome').click(click.home);
+    $('.fa-wrench').click(dashClick.tool);
+    $('.fa-window-minimize').click(dashClick.minimize);
+    $('.fa-window-maximize').click(dashClick.maximize);
+    $('.fa-window-close-o').click(dashClick.close);
+    $('#btnHome').click(dashClick.home);
     //this gets initial partial to display 
     ipcRenderer.send('find-setting', 'Require Login');
     ipcRenderer.send('css-rule', null);
     $('.user-name i').click(utilities.clearCurrentClient);
+    $('.browse-back').click(dashClick.back);
 })
 var utilities = {
     notify: function (messageOptions) {
@@ -84,9 +85,10 @@ var utilities = {
         var client = $(".user-name");
         client.find('span').html('');
         client.hide();
+        dashClick.home();
     }
 }
-var click = {
+var dashClick = {
     navigate: function () {
         var loc = $(this).data('location');
         $('.dashboard-links-container').fadeOut('slow', function () {
@@ -108,11 +110,22 @@ var click = {
     home: function () {
         ipcRenderer.send('navigate', 'dashboard');
         $('.dashboard-links-container').delay(600).fadeIn('slow');
+    },
+    back: () => {
+
     }
 };
+// var nav = [];
+// ipcRenderer.on('navigation-save', (event, arg) => {
+//     nav.push(arg);
+// });
 
-// Listen for async-reply message from main process
+
 ipcRenderer.removeAllListeners('reply');
+ipcRenderer.removeAllListeners('return-setting');
+ipcRenderer.removeAllListeners('return-css');
+
+// Listen for async-reply message from main process 
 ipcRenderer.on('reply', (event, arg) => {
     var container = $('#mainContent');
     container.fadeOut(300, function () {
@@ -122,9 +135,7 @@ ipcRenderer.on('reply', (event, arg) => {
     });
 });
 
-//this is waiting for a settings value to be returned
-ipcRenderer.removeAllListeners('return-setting');
-ipcRenderer.removeAllListeners('return-css');
+//this is waiting for a settings value to be returned 
 ipcRenderer.on('return-setting', (event, arg) => {
     if (arg.value) {
         ipcRenderer.send('navigate', 'login');

@@ -1,8 +1,8 @@
 $(document).ready(() => {
     $('#btnAddImage').click(imageEvent.modal);
+    $('.browse-back').off('click').click(imageEvent.back);
     imageEvent.load();
 });
-
 
 var imageEvent = {
     modal: function () {
@@ -13,19 +13,21 @@ var imageEvent = {
     dialog: () => {
         ipcRenderer.send('dialog-open', {});
     },
-    submit: () => {
+    submit: (e) => {
+        e.preventDefault();
         let client = utilities.currentClient();
         if (client) {
             var data = {
                 client: client,
                 info: {
-                    clientId: client.id,
-                    date: $('#txtimageDate').val(),
-                    bmi: $('#txtbmi').val(),
-                    images: $('#txtImgUrl').val().split(';'),
-                    comment: $('#txtImageComment').val()
+                    clientId: client.id
                 }
             };
+            var form = $("#formAddClientImage :input").serializeArray();
+            for (var index = 0; index < form.length; index++) {
+                var element = form[index];
+                data.info[element.name] = element.value;
+            }
 
             ipcRenderer.send('progress-image-save', data);
         }
@@ -36,6 +38,9 @@ var imageEvent = {
         if (client.id) {
             ipcRenderer.send('find-progress', { id: client.id });
         }
+    },
+    back: () => {
+        ipcRenderer.send('navigate', 'client');
     }
 }
 
@@ -70,10 +75,12 @@ ipcRenderer.on('find-progress-row', (event, arg) => {
         for (var index = 0; index < arg.images.length; index++) {
             let image = arg.images[index];
             let placeHolder = $(placeHolders[index]);
-            placeHolder.empty();
-            let img = $('<img>');
-            img.attr('src', image);
-            img.appendTo(placeHolder);
+            if (image && image != 'null') {
+                placeHolder.empty();
+                let img = $('<img>');
+                img.attr('src', image);
+                img.appendTo(placeHolder);
+            }
         }
         row.hide().appendTo(tbl).fadeIn(1000);
     }

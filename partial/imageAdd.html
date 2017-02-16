@@ -1,26 +1,84 @@
-<form action="POST" role="form" id="formAddClient">
+<form action="POST" role="form" id="formAddClientImage">
     <div class="container-fluid">
         <div class="row">
-            <div class="col-md-6">
+            <div class="col-md-4">
                 <div class="form-group">
                     <label for="imageDate">Date</label>
                     <input class="form-control" name="imageDate" id="txtimageDate" type="date" required />
                 </div>
             </div>
-            <div class="col-md-6">
+            <div class="col-md-4">
                 <div class="form-group">
                     <label for="bmi">BMI</label>
                     <input class="form-control" name="bmi" id="txtbmi" type="number" required />
                 </div>
             </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label for="weight">Weight</label>
+                    <input class="form-control" name="weight" id="txtWeight" type="number" required />
+                </div>
+            </div>
         </div>
-
+        <div class="row">
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label for="neck">Neck</label>
+                    <input class="form-control" name="neck" id="txtMeasureNeck" type="number" required />
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label for="chest">Chest</label>
+                    <input class="form-control" name="chest" id="txtMeasureChest" type="number" required />
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label for="upperArm">Upper Arm</label>
+                    <input class="form-control" name="upperArm" id="txtMeasureUpperArm" type="number" required />
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label for="foreArm">Fore Arm</label>
+                    <input class="form-control" name="foreArm" id="txtMeasurForeArm" type="number" required />
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label for="waist">Waist</label>
+                    <input class="form-control" name="waist" id="txtMeasureWaist" type="number" required />
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label for="hips">Hips</label>
+                    <input class="form-control" name="hips" id="txtMeasureHips" type="number" required />
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label for="thigh">Thigh</label>
+                    <input class="form-control" name="thigh" id="txtMeasureUpperThigh" type="number" required />
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label for="calf">Calf</label>
+                    <input class="form-control" name="calf" id="txtMeasurForeCalf" type="number" required />
+                </div>
+            </div>
+        </div>
         <div class="row">
             <div class="col-md-12">
                 <div class="form-group">
+                    <label for="calf">Progress Images</label>
                     <div class="input-group">
                         <input id="btnImgDialog" type="file" style="display: none" multiple="multiple">
-                        <input type="text" class="form-control" name="image" id="txtImgUrl" placeholder="Select Up to 3 images">
+                        <input type="text" class="form-control" name="images" id="txtImgUrl" placeholder="Select Up to 3 images">
                         <span class="input-group-btn">
                         <button id="btnAddImg" class="btn btn-default" type="button">Select</button>
                     </span>
@@ -37,5 +95,5 @@
             </div>
         </div>
     </div>
-    <button id="btnSubmitImage" type="button" class="btn btn-primary">Submit</button>
+    <button id="btnSubmitImage" type="submit" class="btn btn-primary">Submit</button>
 </form>

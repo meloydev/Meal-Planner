@@ -58,13 +58,6 @@ var clientClick = {
             });
         }
     },
-    delete: (e) => {
-        let client = e.data;
-        var c = confirm('This will delete ' + client.firstName + ' ' + client.lastName);
-        if (c === true) {
-            ipcRenderer.send('delete-client', client.id);
-        }
-    },
     meal: (e) => {
         var selectedClient = e.data;
         utilities.setCurrentClient(selectedClient);
@@ -86,6 +79,10 @@ var clientClick = {
     image: (e) => {
         let client = e.data;
         ipcRenderer.send('profile-image-save', client);
+    },
+    delete: (e) => {
+        var selectedClient = e.data;
+        ipcRenderer.send('delete-client', selectedClient);
     }
 };
 
@@ -172,8 +169,8 @@ ipcRenderer.on('client-all-reply', (event, arg) => {
     }
 });
 //After a client has been "Deleted"
-ipcRenderer.removeAllListeners('client-remove-reply');
-ipcRenderer.on('client-remove-reply', (event, arg) => {
+ipcRenderer.removeAllListeners('client-delete-reply');
+ipcRenderer.on('client-delete-reply', (event, arg) => {
     if (arg.isError) {
         var messageOptions = {
             body: 'Client has been deleted',
@@ -181,10 +178,10 @@ ipcRenderer.on('client-remove-reply', (event, arg) => {
         };
         utilities.notify(messageOptions);
     } else {
-        var row = $('#' + arg.id);
-        row.fadeOut('normal', function () {
-            $(this).remove();
-        });
+        //remove all rows from table
+        let tbl = $('#tblClient tbody');
+        tbl.find('tr').remove();
+        ipcRenderer.send('all-client', {});
     }
 });
 //After a client has been "Updated"
@@ -216,6 +213,7 @@ ipcRenderer.on('client-rows-reply', (event, arg) => {
         row.find('.clientEdit').click(arg.client, clientClick.edit);
         row.find('.clientMeal').click(arg.client, clientClick.meal);
         row.find('.clientImage').click(arg.client, clientClick.images);
+        row.find('.clientDelete').click(arg.client, clientClick.delete);
         row.hide().appendTo(tbl).fadeIn(1000);
     }
 });

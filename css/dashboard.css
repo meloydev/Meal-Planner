@@ -221,3 +221,15 @@
    display: block;
    border-bottom: 1px solid #000;
  }
+
+ .browse-back{ 
+  position: fixed;
+  top:50%;
+  left:10px; 
+ }
+ .browse-back i{
+   color: var(--primary-color);
+ }
+ .default{
+     color: var(--primary-color);
+ }
