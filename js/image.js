@@ -35,8 +35,8 @@ var imageEvent = {
     load: () => {
         //check for a selected client to load saved meal
         let client = utilities.currentClient();
-        if (client.id) {
-            ipcRenderer.send('find-progress', { id: client.id });
+        if (client._id) {
+            ipcRenderer.send('find-progress', { id: client._id });
         }
     },
     back: () => {
@@ -71,10 +71,11 @@ ipcRenderer.on('find-progress-row', (event, arg) => {
         let tbl = $('.table-scroll');
         let row = $(arg.html);
         let placeHolders = row.find('.template-item');
-
-        for (var index = 0; index < arg.images.length; index++) {
-            let image = arg.images[index];
+        let files = arg.images.split(';');
+        for (var index = 0; index < files.length; index++) {
+            let image = files[index];
             let placeHolder = $(placeHolders[index]);
+
             if (image && image != 'null') {
                 placeHolder.empty();
                 let img = $('<img>');

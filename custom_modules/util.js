@@ -1,5 +1,5 @@
 const {dialog} = require('electron');
-const fs = require('fs');
+const fs = require('fs-extra');
 
 exports.openDialogPromise = (client) => {
     return new Promise((res, rej) => {
@@ -72,3 +72,38 @@ exports.mkmDirPromise = (filePath) => {
         });
     });
 }
+
+//uses fs-extra
+exports.copyFilePromise = (src, dest) => {
+    return new Promise((res, rej) => {
+        fs.copy(src, dest, (err) => {
+            if (err)
+                rej(err);
+
+            res(dest);
+        });
+    });
+}
+
+exports.deleteDir = (directory) => {
+    return new Promise((res, rej) => {
+        fs.remove(directory, (err) => {
+            if (err)
+                rej(err);
+
+            res(directory);
+        });
+    });
+}
+
+exports.createDir = (directory) => {
+    return new Promise((res, rej) => {
+        fs.ensureDir(directory, (err) => {
+            if (err)
+                rej(err);
+
+            res(directory);
+        });
+    });
+}
+

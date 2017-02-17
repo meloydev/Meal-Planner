@@ -374,51 +374,34 @@ ipcMain.on('progress-image-save', (event, args) => {
     var d = new Date(args.info.imageDate);
     var newDir = `${imgPath}\\${args.client._id}\\${d.getMonth() + 1}_${d.getDate()}_${d.getFullYear()}`;
     //make a directory for new images
-    util.mkmDirPromise(newDir)
+    util.createDir(newDir)
         .then(value => {
             let files = args.info.images.split(';');
-            //get all files
             let promises = [];
-
             for (var x = 0; x < files.length; x++) {
-                let f = files[x];
-                if (f && f.length > 5) {
-                    var p = util.readFilePromise(f);
-                    promises.push(p);
-                }
+                let src = files[x];
+                let name = path.basename(src);
+                let dest = `${newDir}${path.sep}${name}`;
+                var prom = util.copyFilePromise(src, dest);
+                promises.push(prom);
             }
-
-            //when all promises return
             Promise.all(promises)
-                .then(value => {
-                    let savePromises = [];
-                    for (var i = 0; i < value.length; i++) {
-                        let ext = path.extname(files[i]);
+                .then(values => {
+                    var saveData = args.info;
+                    saveData.clientId = args.client._id;
+                    saveData.images = args.info.images = values.join(';');
 
-                        files[i] = `${newDir}\\${i}${ext}`
-
-
-                        let saveP = util.saveImagePromise(files[i], value[i]);
-                        savePromises.push(saveP);
-                    }
-
-                    Promise.all(savePromises)
+                    dal.insertImagePromise(saveData)
                         .then(value => {
-                            //insert record into DB
-                            dal.insertImagePromise(args.info)
-                                .then(value => {
-                                    win.webContents.send('progress-add-reply', { isError: false, item: value });
-                                })
-                                .catch(err => {
-                                    dialog.showErrorBox("Save Error", err.message);
-                                });
+                            win.webContents.send('progress-add-reply', { isError: false, item: value });
+                        })
+                        .catch(err => {
+                            dialog.showErrorBox("Save Error", err.message);
                         });
-                })
-                .catch(err => {
+                }).catch(err => {
                     dialog.showErrorBox("Save Error", err.message);
                 });
-        })
-        .catch(err => {
+        }).catch(err => {
             dialog.showErrorBox("Save Error", err.message);
         });
 });
