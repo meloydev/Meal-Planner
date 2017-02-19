@@ -224,36 +224,4 @@
    text-align: right;
  }
  
- @media print {
-   #contextMenu {
-     display: none;
-   }
-   .printTitle {
-     display: block; 
-   }
-   .header {
-     display: none;
-   }
-   .base {
-     display: none;
-   }
-   .fa {
-     display: none;
-   }
-   .meal-container {
-     position: absolute;
-     top: 0;
-     left: 0;
-     width: 8.5in;
-     overflow: visible;
-   }
-   .meal-total {
-     display: none;
-   }
-   .table-scroll {
-     overflow: visible;
-   }
-   .logo {
-     display: inline;
-   }
- }
+ 

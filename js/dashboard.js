@@ -1,5 +1,4 @@
-//dashboard.js
-
+//dashboard.js 
 const electron = require('electron');
 const {ipcRenderer} = electron;
 
@@ -110,16 +109,8 @@ var dashClick = {
     home: function () {
         ipcRenderer.send('navigate', 'dashboard');
         $('.dashboard-links-container').delay(600).fadeIn('slow');
-    },
-    back: () => {
-
     }
 };
-// var nav = [];
-// ipcRenderer.on('navigation-save', (event, arg) => {
-//     nav.push(arg);
-// });
-
 
 ipcRenderer.removeAllListeners('reply');
 ipcRenderer.removeAllListeners('return-setting');
@@ -136,11 +127,23 @@ ipcRenderer.on('reply', (event, arg) => {
 });
 
 //this is waiting for a settings value to be returned 
-ipcRenderer.on('return-setting', (event, arg) => {
-    if (arg.value) {
-        ipcRenderer.send('navigate', 'login');
-    } else {
-        ipcRenderer.send('navigate', 'dashboard');
+//depending on value determines correct start page
+ipcRenderer.on('startpage-return-setting', (event, arg) => {
+    //this listener is only needed once.
+    ipcRenderer.removeAllListeners('startpage-return-setting');
+    switch (arg.value) {
+        case null:
+            ipcRenderer.send('navigate', 'setup');
+            break;
+        case true:
+            ipcRenderer.send('navigate', 'login');
+            break;
+        case false:
+            ipcRenderer.send('navigate', 'dashboard');
+            break;
+        default:
+            ipcRenderer.send('navigate', 'setup');
+            break;
     }
 });
 //any DB stored values for CSS properties are set here

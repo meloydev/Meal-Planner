@@ -137,10 +137,6 @@ ipcRenderer.on('modal-window-reply', (event, arg) => {
     } else {
         //send add command
         $('#btnSubmitClient').off('click').click(clientClick.newClientItem);
-        //TODO: adding image to NEW client
-        // let ma = Math.random() * 100;
-        // console.info(ma);
-        // $('#btnAddClientImg').click(client, clientClick.image);
     }
 
 });

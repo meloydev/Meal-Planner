@@ -224,15 +224,27 @@
    display: block;
    border-bottom: 1px solid #000;
  }
-
- .browse-back{ 
-  position: fixed;
-  top:50%;
-  left:10px; 
- }
+ 
  .browse-back i{
    color: var(--primary-color);
+   text-shadow: 3px 2px 5px rgba(0, 0, 0, 0.23);
  }
  .default{
      color: var(--primary-color);
  }
+
+ .browse-back{ 
+    color: var(--primary-color); 
+    transition: .4s;
+    position: fixed;
+    top:50%;
+    left:10px;  
+}
+
+.browse-back:hover{
+ transform: scale(1.1); 
+ 
+}
+.browse-back:active{
+ transform: scale(1); 
+}

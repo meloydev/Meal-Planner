@@ -110,7 +110,7 @@ exports.updateSettingPromise = (args) => {
             if (err) {
                 rej(err);
             } else {
-                res(data)
+                res(args.updatedValue);
             }
         });
     });

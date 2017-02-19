@@ -1,10 +1,10 @@
 const {app, Menu, Tray, BrowserWindow, ipcMain, dialog, shell} = require('electron');
 const fs = require('fs');
 const path = require('path');
+const dal = require('./custom_modules/dal');
 const auth = require('./auth');
 const setting = require('./settings');
 const word = require('./custom_modules/word');
-const dal = require('./custom_modules/dal');
 const util = require('./custom_modules/util');
 
 //local pathing 
@@ -31,7 +31,7 @@ function createWindow() {
     });
 
     //tray menu
-    tray = new Tray(`${imgPath}//icon.png`);
+    tray = new Tray(`${__dirname}/asset/icon.png`);
     tray.setToolTip('Meal Planner XL');
     const contextMenu = Menu.buildFromTemplate([
         { label: 'Maximize', type: 'normal', click: () => { win.maximize(); } },
@@ -46,6 +46,14 @@ function createWindow() {
         { label: '', type: 'separator', click: () => { win.minimize(); } },
         { label: 'Quit', type: 'normal', click: () => { app.quit(); } },
         { label: 'Tools', type: 'normal', click: () => { win.webContents.openDevTools(); } },
+        {
+            label: 'Setup', type: 'normal', click: () => {
+                let filePath = `${__dirname}/partial/setup.html`;
+                fs.readFile(filePath, 'utf8', function (err, data) {
+                    win.webContents.send('reply', data);
+                });
+            }
+        }
     ]);
     tray.setContextMenu(contextMenu);
 }
@@ -150,7 +158,13 @@ ipcMain.on('find-setting', (event, args) => {
 
     dal.getSettingPromise(args)
         .then(values => {
-            win.webContents.send('return-setting', values);
+            var callBack = (args === 'Require Login') ? 'startpage-return-setting' : 'return-setting';
+            if (values) {
+                win.webContents.send(callBack, values);
+            } else {
+                //default value
+                win.webContents.send(callBack, { label: args, value: null });
+            }
         })
         .catch(err => {
             dialog.showErrorBox('Error', err.message);
@@ -168,7 +182,7 @@ ipcMain.on('find-setting', (event, args) => {
 ipcMain.on('update-setting', (event, args) => {
     dal.updateSettingPromise(args)
         .then((setting => {
-            win.webContents.send('return-setting', setting);
+            win.webContents.send('return-setting', setting.value);
         }))
         .catch((err) => {
             tray.displayBalloon({ title: 'Error', content: err.message });
@@ -200,24 +214,17 @@ ipcMain.on('food-search-byId', (event, args) => {
 ipcMain.on('profile-image-save', (event, args) => {
     util.openDialogPromise(args)
         .then(dialogReturn => {
-            util.readFilePromise(dialogReturn.image)
-                .then(imgRaw => {
-                    //let imgRaw = fs.readFileSync(dialogReturn.image);
-                    let ext = path.extname(dialogReturn.image);
-                    let writeTo = `${imgPath}\\Profile\\${dialogReturn.client._id}${ext}`;
-
-                    //saves the new image to disk with 
-                    //clients id as filename
-                    util.saveImagePromise(writeTo, imgRaw)
-                        .then(value => {
-                            win.webContents.send('image-save-reply', value);
-                        })
-                        .catch(value => {
-                            dialog.showErrorBox("File Save Error", value.message);
-                        });
+            //get image pathing
+            let newDir = `${imgPath}\\${dialogReturn.client._id}`;
+            let name = path.basename(dialogReturn.image);
+            let dest = `${newDir}${path.sep}${name}`;
+            //move image over to our folders
+            util.copyFilePromise(dialogReturn.image, dest)
+                .then(value => {
+                    win.webContents.send('image-save-reply', value);
                 })
-                .catch(err => {
-                    dialog.showErrorBox("File Save Error", err.message);
+                .catch(value => {
+                    dialog.showErrorBox("File Save Error", value.message);
                 });
         })
         .catch(err => {
@@ -227,7 +234,7 @@ ipcMain.on('profile-image-save', (event, args) => {
 ipcMain.on('add-client', (event, client) => {
     if (client.profileImage === "") {
         //put in default image 
-        client.profileImage = `${process.env.USERPROFILE}\\Documents\\Data\\Image\\holder.png`
+        client.profileImage = `${__dirname}\\asset\\avatar.png`;
     }
 
     dal.insertClientPromise(client)
@@ -243,7 +250,7 @@ ipcMain.on('add-client', (event, client) => {
 ipcMain.on('update-client', (event, client) => {
     if (client.profileImage === "") {
         //put in default image 
-        client.profileImage = `${process.env.USERPROFILE}\\Documents\\Data\\Image\\holder.png`
+        client.profileImage = `${__dirname}\\asset\\avatar.png`;
     }
     dal.updateClientPromise(client)
         .then(values => {
@@ -358,11 +365,7 @@ ipcMain.on('find-meal', (event, args) => {
 ipcMain.on('dialog-open', (event, args) => {
     util.openDialogAllowMultiplePromise(args)
         .then(dialogReturn => {
-            var image = {
-                first: dialogReturn.image.safeElement(0),
-                second: dialogReturn.image.safeElement(1),
-                third: dialogReturn.image.safeElement(2)
-            };
+            var image = dialogReturn.image.join(';');
             win.webContents.send('dialog-open-reply', image);
         })
         .catch(err => {
@@ -379,7 +382,7 @@ ipcMain.on('progress-image-save', (event, args) => {
             let files = args.info.images.split(';');
             let promises = [];
             for (var x = 0; x < files.length; x++) {
-                let src = files[x];
+                let src = files[x] || `${__dirname}\\asset\\avatar.png`;
                 let name = path.basename(src);
                 let dest = `${newDir}${path.sep}${name}`;
                 var prom = util.copyFilePromise(src, dest);
@@ -439,6 +442,19 @@ ipcMain.on('generate-client-progress-row', (event, args) => {
     }
 });
 
+
+//setup page
+ipcMain.on('setup-start', (event, args) => {
+    var rtrn = {
+        message: "Success"
+    };
+    var img = util.createDir(imgPath);
+    let data = util.createDir(documentPath);
+
+    Promise.all([img, data], value => {
+        win.webContents.send('setup-start-reply', rtrn);
+    });
+});
 
 
 

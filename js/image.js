@@ -28,7 +28,6 @@ var imageEvent = {
                 var element = form[index];
                 data.info[element.name] = element.value;
             }
-
             ipcRenderer.send('progress-image-save', data);
         }
     },
@@ -47,7 +46,7 @@ var imageEvent = {
 // Listen for async-reply message from main process
 ipcRenderer.removeAllListeners('dialog-open-reply');
 ipcRenderer.on('dialog-open-reply', (event, arg) => {
-    $('#txtImgUrl').val(`${arg.first};${arg.second};${arg.third}`);
+    $('#txtImgUrl').val(arg);
 });
 
 ipcRenderer.removeAllListeners('progress-add-reply');

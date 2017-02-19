@@ -1,0 +1,135 @@
+.header{
+    height: 100vh;
+     transition: 1s;
+}
+.partial-container{
+    top:-85vh;
+    transition: .5s;
+}
+.login-control{
+   width: 50%;
+   margin: 0 auto;
+   top:10vh;
+   position: relative;
+}
+ 
+.window-control{
+    display: none;
+} 
+.tools{
+    display: none;
+} 
+.dashboard-links-container{
+    display: none;
+}
+.setup{
+    padding:50px;
+    text-align:center;
+    color: var(--text-color); 
+}
+.admin-container{ 
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    margin-top: 75px;
+    font-size: 5em; 
+}
+.admin-container > div{
+    margin: 0 45px; 
+}
+.admin-setup{ 
+   text-align: center;
+   margin-top: 50px; 
+}
+.admin-yes{
+     padding:100px;
+     transition: .4s; 
+     cursor: pointer; 
+}
+.admin-yes:hover{ 
+     box-shadow: 0 3px 13px rgba(0, 0, 0, 0.23), 0 3px 10px rgba(0, 0, 0, 0.16);
+     transform: scale(1.1); 
+}
+.admin-yes:active{
+     transform: scale(1);  
+}
+.admin-seperate{
+    padding:100px 0;
+    border-right: 1px solid; 
+    color: var(--text-color); 
+}
+.admin-no{
+    padding:100px;
+    transition: .4s; 
+    cursor: pointer; 
+}
+.admin-no:hover{
+    /*background-color: red;*/
+    box-shadow: 0 3px 13px rgba(0, 0, 0, 0.23), 0 3px 10px rgba(0, 0, 0, 0.16);
+    transform: scale(1.1); 
+}
+.admin-no:active{
+    transform: scale(1);  
+}
+
+.background-setup{
+    display: none;
+    margin-top: 50px;
+}
+
+.background-select { 
+    display: flex;
+    flex-wrap: wrap;
+}
+.background-select> div{
+    height:100px;
+    width: 100px;
+    box-shadow: 10px 10px 10px rgba(0, 0, 0, 0.23);
+    transition: .4s;
+    position: relative;
+    border-radius: 6px; 
+    margin: 10px;
+}
+.background-select > div:hover{
+      transform: scale(1.1); 
+}
+
+.ok-button{
+    border:4px solid  var(--primary-color);;
+    border-radius: 50%;
+    padding:10px;
+    font-size: 2.5em;
+    background-color: var(--primary-color);
+    color: #fff;
+    transition: .4s;
+    position: absolute;
+    bottom: 75px;
+    right:25px;
+    box-shadow: 0 3px 13px rgba(0, 0, 0, 0.23), 0 3px 10px rgba(0, 0, 0, 0.16);
+    animation: shake 3s infinite;
+    animation-delay: 1s;
+}
+
+.ok-button:hover{
+ transform: scale(1.1); 
+ animation: none;
+}
+.ok-button:active{
+ transform: scale(1); 
+}
+
+@media screen and (min-width: 768px){
+    .modal-dialog {
+        width: 850px;
+        margin: 30px auto;
+    } 
+}
+
+@keyframes shake {
+  from {
+    transform:rotatex(360deg);
+  }
+    66%, 100% {
+      transform:rotatex(0deg);
+    } 
+}

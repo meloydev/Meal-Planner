@@ -1,3 +1,10 @@
+@media screen and (min-width: 768px){
+    .modal-dialog {
+        width: 700px;
+        margin: 30px auto;
+    } 
+}
+ 
 .empty-image{
     text-align: center;
     margin-top: 50px;
@@ -52,6 +59,26 @@
    bottom: 25px;
    right: 25px;
  }
+
+  .client-detail-container{ 
+      color:#2c3e50; 
+      padding:15px;
+      border-top: 1px solid #2c3e50; 
+      font-size: .8em;
+      font-style: italic;
+      position :relative;
+      width: 95%;
+      margin: 0 auto;
+    }
+    .client-detail-container-title{ 
+      background-color: #fff;
+      position :absolute;
+      top:-15px;
+      left:0;
+      padding-right:15px;
+      font-size: 1.4em;
+      font-style: normal;
+    }
   
 /*This is for the template*/ 
 .card-container{
@@ -78,6 +105,7 @@
   transition: 300ms;
   border-radius: 50%;
   overflow: hidden;
+   z-index: 2;
 }
 .template-item img{
   height:100%;
@@ -85,7 +113,7 @@
 }
 .template-item:hover{
    transform: scale(1.3);
-   border-radius: 6px;
+   border-radius: 6px; 
 }
 .card-date{
   position: absolute;
@@ -131,6 +159,21 @@
   font-size: 2em;
   color:#fff;
 }
+.measurment-container{
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.measurment-container > div{
+margin: 10px;
+border: 1px solid;
+padding:10px;
+border-radius: 6px;
+}
+
+
+
+
 
  @media screen and (max-width: 720px) { 
     .template-item{
