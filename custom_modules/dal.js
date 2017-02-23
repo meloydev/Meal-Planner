@@ -84,7 +84,7 @@ exports.deleteClientPromise = (client) => {
                 res(data);
             }
         });
-    })
+    });
 }
 
 exports.insertClientPromise = (client) => {
@@ -236,6 +236,18 @@ exports.getProgressPromise = (id) => {
                     res(data);
                 }
             });
+    });
+}
+
+exports.deleteProgress = (id) => {
+    return new Promise((res, rej) => {
+        dbImage.remove({ clientId: id }, function (err, data) {
+            if (err) {
+                rej(err);
+            } else {
+                res(data);
+            }
+        });
     });
 }
 

@@ -59,7 +59,10 @@ var setupClick = {
     },
     done: (e) => {
         ipcRenderer.send('navigate', 'dashboard');
-    }
+    },
+    image: (e) => {
+        ipcRenderer.send('profile-image-save', {});
+    },
 };
 
 var clientValidation = {
@@ -88,7 +91,7 @@ ipcRenderer.on('setup-start-reply', (event, arg) => {
 
 ipcRenderer.removeAllListeners('return-setting');
 ipcRenderer.on('return-setting', (event, arg) => {
-    document.documentElement.style.setProperty('--primary-color', arg);
+    document.documentElement.style.setProperty('--primary-color', arg.value);
 });
 
 // Listen for async-reply message from main process
@@ -112,6 +115,7 @@ ipcRenderer.on('modal-window-reply', (event, arg) => {
 
     $('#btnSubmitClient').off('click').click(setupClick.newClientItem);
     $('#cbIsAdmin').val('true').attr('disabled', 'disabled');
+    $('#btnAddClientImg').click(setupClick.image);
 });
 
 ipcRenderer.removeAllListeners('client-add-reply');

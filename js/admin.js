@@ -3,9 +3,9 @@
 $(document).ready(function () {
     $('#formAdd').off('submit').on('submit', submit.newFoodItem);
     $('#ddlReqLogin').off('change').on('change', adminChange.reqLogin);
-    //change background color
-    var primaryColor = document.getElementById('colorPicker');
-    primaryColor.onchange = adminChange.color;
+    $('#ddlReqLogin').off('change').on('change', adminChange.reqLogin);
+    //change background color 
+    $('.background-select div').off('click').click(adminChange.color);
     //get defaults
     ipcRenderer.send('find-setting', 'Require Login');
     ipcRenderer.send('find-setting', 'css rule');
@@ -27,17 +27,18 @@ var adminChange = {
         };
         ipcRenderer.send('update-setting', data);
     },
-    color: (ev) => {
-        document.documentElement.style.setProperty('--primary-color', ev.target.value);
+    color: (e) => {
+        //prevent form submitting  
+        var newBackground = $(e.currentTarget).css('backgroundColor');
         var newValue = {
             label: 'css rule',
             updatedValue: {
                 property: '--primary-color',
-                value: ev.target.value
+                value: newBackground
             }
         }
         ipcRenderer.send('update-setting', newValue);
-    }
+    },
 }
 
 var submit = {
@@ -59,10 +60,8 @@ ipcRenderer.on('return-setting', (event, arg) => {
     if (arg && arg.label === 'Require Login') {
         $('#ddlReqLogin').val(arg.value.toString());
     }
-    if (arg && arg.label === 'css rule') {
-        let cssRules = arg.value;
-        var primaryColor = document.getElementById('colorPicker');
-        primaryColor.value = cssRules.value;
+    if (arg && arg.property === '--primary-color') {
+        document.documentElement.style.setProperty('--primary-color', arg.value);
     }
 });
 

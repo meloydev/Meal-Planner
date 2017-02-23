@@ -13,7 +13,7 @@ var load = {
   page: () => {
     //check for a selected client to load saved meal
     let client = utilities.currentClient();
-    if (client.id) {
+    if (client._id) {
       ipcRenderer.send('find-meal', client);
     }
   }
@@ -21,6 +21,7 @@ var load = {
 
 var mealSave = {
   save: (clientId) => {
+    debugger;
     //list of tables making up the meal plan
     let elements = ['One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine'];
     //mealplan object
@@ -96,9 +97,9 @@ var mealClick = {
     $('.top-left').toggleClass("middle-fix");
   },
   save: function () {
-    var clientId = utilities.currentClient().id;
+    var clientId = utilities.currentClient();
     if (clientId) {
-      mealSave.save(clientId);
+      mealSave.save(clientId._id);
     } else {
       ipcRenderer.send('show-ballon', { title: 'Error', content: 'No Client Selected' });
     }

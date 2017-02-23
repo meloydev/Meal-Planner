@@ -81,9 +81,13 @@ var clientClick = {
         ipcRenderer.send('profile-image-save', client);
     },
     delete: (e) => {
+        ipcRenderer.send('modal-window', { body: 'clientDelete', title: 'Confirm' });
+    },
+    confirmDelete: (e) => {
         var selectedClient = e.data;
         ipcRenderer.send('delete-client', selectedClient);
-    }
+    },
+
 };
 
 var clientValidation = {
@@ -120,6 +124,7 @@ ipcRenderer.on('modal-window-reply', (event, arg) => {
     //show modal
     popUp.modal();
     //if we sent back arguments, then it's an update not an add client. 
+    $('#btnAddClientImg').click(client, clientClick.image);
     if (arg.values) {
         var client = arg.values;
 
@@ -133,7 +138,6 @@ ipcRenderer.on('modal-window-reply', (event, arg) => {
 
         //click event
         $('#btnSubmitClient').off('click').click(arg, clientClick.editClientItem);
-        $('#btnAddClientImg').click(client, clientClick.image);
     } else {
         //send add command
         $('#btnSubmitClient').off('click').click(clientClick.newClientItem);
@@ -221,5 +225,10 @@ ipcRenderer.on('image-save-reply', (event, arg) => {
     } else {
         $('#txtProfileImgUrl').val(arg);
     }
+});
+//delete client
+ipcRenderer.removeAllListeners('delete-client-reply');
+ipcRenderer.on('delete-client-reply', (event, arg) => {
+
 });
 

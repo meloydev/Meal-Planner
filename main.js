@@ -182,7 +182,7 @@ ipcMain.on('find-setting', (event, args) => {
 ipcMain.on('update-setting', (event, args) => {
     dal.updateSettingPromise(args)
         .then((setting => {
-            win.webContents.send('return-setting', setting.value);
+            win.webContents.send('return-setting', setting);
         }))
         .catch((err) => {
             tray.displayBalloon({ title: 'Error', content: err.message });
@@ -273,19 +273,6 @@ ipcMain.on('all-client', (event, args) => {
             dialog.showErrorBox("File Save Error", err.message);
         });
 });
-ipcMain.on('delete-client', (event, args) => {
-    dal.deleteClientPromise(args._id)
-        .then(values => {
-            win.webContents.send('client-delete-reply', {
-                isError: false,
-                message: 'Client removed successfully',
-                client: args
-            });
-        })
-        .catch(err => {
-            dialog.showErrorBox("Client delete Error", err.message);
-        });
-});
 ipcMain.on('generate-client-rows', (event, args) => {
     //get template to workwith
     let filePath = `${__dirname}/template/client.html`;
@@ -305,6 +292,21 @@ ipcMain.on('generate-client-rows', (event, args) => {
         }
         win.webContents.send('client-rows-reply', rtrn);
     }
+});
+ipcMain.on('delete-client', (event, args) => {
+    let clientId = args._id;
+    let client = dal.deleteClientPromise(clientId);
+    let meal = dal.deleteMealPromise(clientId);
+    let progress = dal.deleteProgress(clientId);
+    let dir = util.deleteDir(`${imgPath}\\${clientId}`);
+
+    Promise.all([client, meal, progress, dir])
+        .then(value => {
+            debugger;
+        })
+        .catch(err => {
+            debugger;
+        });
 });
 
 //meal plan
@@ -428,7 +430,7 @@ ipcMain.on('generate-client-progress-row', (event, args) => {
     for (var i = 0; i < args.length; i++) {
         var progress = args[i];
         var d = new Date(progress.imageDate);
-        progress.formattedDate = `${d.getMonth() + 1}-${d.getDate()}-${d.getFullYear()}`;
+        progress.formattedDate = `${d.getMonth() + 1}-${d.getUTCDate()}-${d.getFullYear()}`;
         var rtrn = {
             html: template,
             progress: progress,

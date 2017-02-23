@@ -28,6 +28,7 @@
     font-size:20.8px;
 }
 
+
     input[type="color"]{
       opacity: 0;
       width: 0;
@@ -38,3 +39,20 @@
         color:var(--primary-color);
         cursor: pointer;
     }
+
+.background-select { 
+    display: flex;
+    flex-wrap: wrap;
+}
+.background-select> div{
+    height:35px;
+    width: 35px;
+    box-shadow: 3px 3px 3px rgba(0, 0, 0, 0.23);
+    transition: .4s;
+    position: relative;
+    border-radius: 6px; 
+    margin: 10px;
+}
+.background-select > div:hover{
+      transform: scale(1.1); 
+}

@@ -27,51 +27,69 @@
     text-align:center;
     color: var(--text-color); 
 }
+
+.admin-setup{ 
+   text-align: center;
+   margin-top: 50px;  
+}
+
+ 
+/*yes/no buttons*/
 .admin-container{ 
     text-align: center;
     display: flex;
     justify-content: center;
     margin-top: 75px;
-    font-size: 5em; 
+    font-size: 7em; 
+    align-items: center;
 }
 .admin-container > div{
-    margin: 0 45px; 
+    margin: 0 60px; 
+    padding:10px;
+    line-height: 1;
+    position: relative; 
 }
-.admin-setup{ 
-   text-align: center;
-   margin-top: 50px; 
-}
-.admin-yes{
-     padding:100px;
+
+.admin-yes{  
      transition: .4s; 
      cursor: pointer; 
 }
-.admin-yes:hover{ 
-     box-shadow: 0 3px 13px rgba(0, 0, 0, 0.23), 0 3px 10px rgba(0, 0, 0, 0.16);
-     transform: scale(1.1); 
+.admin-yes:hover{  
+     transform: scale(1.1);
 }
 .admin-yes:active{
      transform: scale(1);  
 }
-.admin-seperate{
-    padding:100px 0;
+.admin-seperate{  
+    padding:150px 0 !important;
     border-right: 1px solid; 
     color: var(--text-color); 
 }
-.admin-no{
-    padding:100px;
-    transition: .4s; 
-    cursor: pointer; 
+.admin-no{ 
+     transition: .4s; 
+     cursor: pointer; 
 }
-.admin-no:hover{
-    /*background-color: red;*/
-    box-shadow: 0 3px 13px rgba(0, 0, 0, 0.23), 0 3px 10px rgba(0, 0, 0, 0.16);
+.admin-no:hover{ 
     transform: scale(1.1); 
 }
 .admin-no:active{
     transform: scale(1);  
 }
 
+.underline{
+    border-bottom: 4px solid;
+    transition: .4s;
+    position: absolute;
+    bottom: 0;
+    right:0;
+    width:0;  
+    width: 0;
+}
+
+.admin-container > div:hover .underline{
+  width: 100%;
+}
+ 
 .background-setup{
     display: none;
     margin-top: 50px;

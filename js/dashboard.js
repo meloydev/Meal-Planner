@@ -113,7 +113,7 @@ var dashClick = {
 };
 
 ipcRenderer.removeAllListeners('reply');
-ipcRenderer.removeAllListeners('return-setting');
+ipcRenderer.removeAllListeners('startpage-return-setting');
 ipcRenderer.removeAllListeners('return-css');
 
 // Listen for async-reply message from main process 

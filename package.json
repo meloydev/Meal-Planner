@@ -12,6 +12,7 @@
   "license": "ISC",
   "dependencies": {
     "docxtemplater": "^3.0.2",
+    "fs-extra": "^2.0.0",
     "jquery": "^3.1.1",
     "jszip": "^2.6.1",
     "nedb": "^1.8.0"
