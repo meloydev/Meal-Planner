@@ -153,6 +153,16 @@ ipcMain.on('add-food', (event, args) => {
             });
         });
 });
+ipcMain.on('program-reset', (event, args) => {
+    let img = util.deleteDir(imgPath);
+    let data = util.deleteDir(documentPath);
+    Promise.all([img, data])
+        .then((value) => {
+            app.relaunch();
+            app.exit(0);
+        })
+        .catch(err => { });
+});
 //these calls are to query the settings DB
 ipcMain.on('find-setting', (event, args) => {
 
@@ -302,10 +312,10 @@ ipcMain.on('delete-client', (event, args) => {
 
     Promise.all([client, meal, progress, dir])
         .then(value => {
-            debugger;
+            win.webContents.send('client-delete-reply', { isError: false, message: 'Client has been deleted' });
         })
         .catch(err => {
-            debugger;
+            win.webContents.send('client-delete-reply', { isError: true, message: err.message });
         });
 });
 

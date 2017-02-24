@@ -81,13 +81,12 @@ var clientClick = {
         ipcRenderer.send('profile-image-save', client);
     },
     delete: (e) => {
-        ipcRenderer.send('modal-window', { body: 'clientDelete', title: 'Confirm' });
+        ipcRenderer.send('modal-window', { body: 'clientDelete', title: 'Confirm', values: e.data });
     },
     confirmDelete: (e) => {
         var selectedClient = e.data;
         ipcRenderer.send('delete-client', selectedClient);
     },
-
 };
 
 var clientValidation = {
@@ -123,26 +122,37 @@ ipcRenderer.on('modal-window-reply', (event, arg) => {
     contents.appendTo(popupBody);
     //show modal
     popUp.modal();
-    //if we sent back arguments, then it's an update not an add client. 
-    $('#btnAddClientImg').click(client, clientClick.image);
-    if (arg.values) {
-        var client = arg.values;
-
-        //set control values based on name property
-        for (var propertyName in client) {
-            var control = $(`[name='${propertyName}']`);
-            if (control) {
-                control.val(client[propertyName]);
+    switch (arg.title) {
+        case 'Confirm':
+            $('#btnConfirmTrue').off('click').click(arg.values, clientClick.confirmDelete);
+            $('#btnConfirmFalse').off('click').click(() => {
+                popUp.modal('toggle');
+            });
+            break;
+        case 'Edit Client':
+            var client = arg.values;
+            //set control values based on name property
+            for (var propertyName in client) {
+                var control = $(`[name='${propertyName}']`);
+                if (control) {
+                    control.val(client[propertyName]);
+                }
             }
-        }
+            //if we sent back arguments, then it's an update not an add client. 
+            $('#btnAddClientImg').click(client, clientClick.image);
+            //click event
+            $('#btnSubmitClient').off('click').click(arg, clientClick.editClientItem);
+            $('#imgRow').show();
+            break;
+        case 'Add Client':
+            //send add command
+            $('#btnSubmitClient').off('click').click(clientClick.newClientItem);
+            $('#imgRow').hide();
+            break;
 
-        //click event
-        $('#btnSubmitClient').off('click').click(arg, clientClick.editClientItem);
-    } else {
-        //send add command
-        $('#btnSubmitClient').off('click').click(clientClick.newClientItem);
+        default:
+            break;
     }
-
 });
 //After clients INSERT has been performed
 ipcRenderer.removeAllListeners('client-add-reply');
@@ -183,6 +193,8 @@ ipcRenderer.on('client-delete-reply', (event, arg) => {
         tbl.find('tr').remove();
         ipcRenderer.send('all-client', {});
     }
+    var popUp = $('#modal-window');
+    popUp.modal('toggle');
 });
 //After a client has been "Updated"
 ipcRenderer.removeAllListeners('client-update-reply');
@@ -226,9 +238,5 @@ ipcRenderer.on('image-save-reply', (event, arg) => {
         $('#txtProfileImgUrl').val(arg);
     }
 });
-//delete client
-ipcRenderer.removeAllListeners('delete-client-reply');
-ipcRenderer.on('delete-client-reply', (event, arg) => {
 
-});
 

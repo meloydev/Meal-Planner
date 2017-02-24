@@ -6,6 +6,8 @@ $(document).ready(function () {
     $('#ddlReqLogin').off('change').on('change', adminChange.reqLogin);
     //change background color 
     $('.background-select div').off('click').click(adminChange.color);
+    //reset application
+    $('#btnReset').off('click').click(adminChange.reset);
     //get defaults
     ipcRenderer.send('find-setting', 'Require Login');
     ipcRenderer.send('find-setting', 'css rule');
@@ -39,6 +41,9 @@ var adminChange = {
         }
         ipcRenderer.send('update-setting', newValue);
     },
+    reset: () => {
+        ipcRenderer.send('program-reset', {});
+    }
 }
 
 var submit = {
