@@ -1,31 +1,27 @@
-## Synopsis
-
-At the top of the file there should be a short introduction and/ or overview that explains **what** the project is. This description should match descriptions added for package managers (Gemspec, package.json, etc.)
-
-## Code Example
-
-Show what the library does as concisely as possible, developers should be able to figure out **how** your project solves their problem by looking at the code example. Make sure the API you are showing off is obvious, and that your code is short and concise.
-
-## Motivation
-
-A short description of the motivation behind the creation and maintenance of the project. This should explain **why** the project exists.
-
 ## Installation
 
-Provide code examples and explanations of how to get the project.
+#### git clone https://github.com/meloydev/Meal-Planner.git
 
-## API Reference
+#### npm Install
+ 
+## Motivation
 
-Depending on the size of the project, if it is small and simple enough the reference docs can be added to the README. For medium size to larger projects it is important to at least provide a link to where the API reference docs live.
+This app was created by me for a local gym owner who originally wanted a way to created meal plans for his clients, this quickly
+turned into more request as he thought of more feature he wanted. It also gave me a good way to practice Node.js and Electron app building
+ 
+## State of the project
+I would put the state of this project in Beta, items that need addressed are:
 
-## Tests
-
-Describe and show how to run the tests with code examples.
-
-## Contributors
-
-Let people know how they can dive into the project, include important links to things like issue trackers, irc, twitter accounts if applicable.
+1. Client side validation.
+2. Password recovery.
+3. Visual tweaks for added consistency.
+4. Currently have 3 ways the app notifies users of activities.
+5. Error handling on some items.
+6. Client window is not responsive design.
+7. Meal plan .docx template should be user modifiable.
+8. When adding food items, check for duplicates
+9. And many more..
 
 ## License
 
-A short snippet describing the license (MIT, Apache, etc.)
+Please do whatever you like with the code :)

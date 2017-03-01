@@ -98,25 +98,7 @@
  .middle-fix {
    margin: 15px;
  }
- 
-  .printTitle {
-    height:11in;
-     width:8in;
-     text-align: center;
-     position: relative;
-     display: none;
- }
- 
- 
- .printTotals {
-   width: 180px;
-   font-size: .8em; 
-   margin: 0 auto;
-   position: absolute;
-   bottom: 2in;
-   left: calc(4in - 90px);
- }
- 
+  
  .meal-container {
    background-color: #fff;
    position: relative;
@@ -149,6 +131,7 @@
  .meal-container table tbody tr td {
    text-align: left;
    padding-left: 30px;
+   padding:10px 0;
  }
  
  .meal-container table tr td:nth-child(n+2) {
@@ -183,13 +166,27 @@
    overflow: auto;
  }
  .meal-notes{
-   padding: 5px;   
-   background-color: #f5f5f5;
-   color:#757575;
-   font-size: .8em;
+    color:#2c3e50; 
+    padding:15px;
+    border-top: 1px solid #2c3e50;
+    border-bottom: 1px solid #2c3e50;
+    font-size: .8em;
+    font-style: italic;
+    position :relative;
+    width: 95%;
+    margin: 15px auto;
  }
  .meal-notes span{
-   display: none;
+    background-color: #fff;
+    position :absolute;
+    top:-15px;
+    left:0;
+    padding-right:15px;
+    font-size: 1.4em;
+    font-style: normal;
+ }
+ .meal-notes p{
+  margin: 5px 10px;
  }
  .meal-total {
    position: absolute;
@@ -222,6 +219,17 @@
  
  .meal-popout td:nth-child(2) {
    text-align: right;
+ }
+ .delete{
+   width: 0 !important;
+   padding: 0 !important;
+   position: relative;
+ }
+
+ .delete-row{
+   position: absolute;
+   top: -15px;
+   right:-25px;
  }
  
  

@@ -57,7 +57,7 @@ ipcRenderer.on('progress-add-reply', (event, arg) => {
 ipcRenderer.removeAllListeners('find-progress-reply');
 ipcRenderer.on('find-progress-reply', (event, arg) => {
     if (arg && arg.progress.length > 0) {
-        $('.table-scroll').empty()
+        $('.table-scroll').empty();
         ipcRenderer.send('generate-client-progress-row', arg.progress);
     }
 });

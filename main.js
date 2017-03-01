@@ -277,10 +277,19 @@ ipcMain.on('update-client', (event, client) => {
 ipcMain.on('all-client', (event, args) => {
     dal.getClientsPromise()
         .then(values => {
-            win.webContents.send('client-all-reply', values);
+            let rtrn = {
+                length: values.length,
+                clients: values,
+                isError: false
+            };
+            win.webContents.send('client-all-reply', rtrn);
         })
         .catch(err => {
-            dialog.showErrorBox("File Save Error", err.message);
+            let rtrn = {
+                message: err.message,
+                isError: true
+            };
+            dialog.showErrorBox("File Save Error", rtrn);
         });
 });
 ipcMain.on('generate-client-rows', (event, args) => {
@@ -330,7 +339,7 @@ ipcMain.on('add-meal', (event, args) => {
             dialog.showMessageBox({
                 title: 'Options',
                 message: 'Meal plan has been successfully saved',
-                buttons: ['Create Word document', 'Create PDF', 'Close']
+                buttons: ['Create Word document', 'Close']
             }, ((dialogOption) => {
                 if (dialogOption === 0) {
                     let mealPlan = values;

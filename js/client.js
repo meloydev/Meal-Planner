@@ -175,7 +175,10 @@ ipcRenderer.on('client-all-reply', (event, arg) => {
     if (arg.isError) {
         utilities.notify(arg.message);
     } else {
-        ipcRenderer.send('generate-client-rows', arg);
+        if (arg.length > 0) {
+            $('#tblClient tbody').empty();
+            ipcRenderer.send('generate-client-rows', arg.clients);
+        }
     }
 });
 //After a client has been "Deleted"

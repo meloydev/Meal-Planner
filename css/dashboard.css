@@ -189,7 +189,7 @@
  /*partial dashboard*/
  
  .center-quote {
-   font-size: 2em;
+   font-size: 45px;
    margin: 14vh 0;
    text-align: center;
  }
@@ -248,3 +248,29 @@
 .browse-back:active{
  transform: scale(1); 
 }
+
+.btn-circle-default{
+    border-radius: 50%;
+    padding: 0;
+    color: #fff;
+    font-size: 1.5em;
+    height: 40px;
+    width: 40px;
+    overflow: hidden;
+    line-height: 1.7;
+    text-align: center;
+    margin: 15px 10px 0;
+    box-shadow: 2px 3px 6px rgba(0, 0, 0, 0.23);
+    transition: 400ms;
+    position: relative;
+    background-color: var(--primary-color);
+}
+
+.btn-circle-default:hover{
+    transform: scale(1.1);
+}
+
+.btn-circle-default:active{
+  transform: scale(1);
+}
+ 

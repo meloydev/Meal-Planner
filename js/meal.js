@@ -5,7 +5,6 @@ $(document).ready(function () {
   $('#btnPrint').off('click').click(mealClick.save);
   $('#btnAdd').off('click').click(mealClick.modal);
   $('#btnUser').off('click').click(mealClick.modal);
-  $('#contextMenu').on('mouseleave', mealHover.context);
   load.page();
 });
 
@@ -21,7 +20,6 @@ var load = {
 
 var mealSave = {
   save: (clientId) => {
-    debugger;
     //list of tables making up the meal plan
     let elements = ['One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine'];
     //mealplan object
@@ -44,9 +42,11 @@ var mealSave = {
     for (var index = 0; index < elements.length; index++) {
       var tbl = {
         table: elements[index],
-        items: []
+        items: [],
+        comment: ''
       };
-      let tblRows = $('#tbl' + elements[index] + ' tbody tr');
+      let tblRows = $(`#tbl${elements[index]} tbody tr`);
+      tbl.comment = $(`#notesMeal${elements[index]} p`).html();
 
       tblRows.each(function (index, item) {
         let columns = $(item).find('td');
@@ -61,7 +61,10 @@ var mealSave = {
           Protein: columns[6].innerHTML
         });
       });
-      mealPlan.tables.push(tbl);
+      //save meals that have items
+      if (tbl.items.length > 0) {
+        mealPlan.tables.push(tbl);
+      }
     }
     //call main process
     ipcRenderer.send('add-meal', mealPlan);
@@ -118,10 +121,15 @@ var mealClick = {
       document.getElementById('lblCarb').innerHTML = meals.totals.carb;
       document.getElementById('lblProtein').innerHTML = meals.totals.protein;
     }
+
+    //load tables
     $(meals.tables).each((index, meal) => {
+      //load saved comments
+      var comment = $(`#notesMeal${meal.table} p`);
+      comment.html(meal.comment);
       //get table
-      var container = $('#meal' + meal.table);
-      let tbl = $('#tbl' + meal.table);
+      var container = $(`#meal${meal.table}`);
+      let tbl = $(`#tbl${meal.table}`);
       //create rows 
       for (var i = 0; i < meal.items.length; i++) {
         container.removeClass('meal-empty');
@@ -133,19 +141,30 @@ var mealClick = {
           $('<td class="cal">').text(item.Calories),
           $('<td class="fat">').text(item.Fat),
           $('<td class="carb">').text(item.Carb),
-          $('<td class="pro">').text(item.Protein)
+          $('<td class="pro">').text(item.Protein),
+          $('<td class="delete">').html('<i class="btn-circle-default red delete-row fa fa-times" type="button"></i>')
         );
+        //set row ID
+        var rowId = `table_${meal.table}_row_${i}`;
+        row.attr('id', rowId);
+        //add actions
+        row.find('.delete i').click(rowId, mealClick.removeRow);
+        //add row to grid
         row.hide().appendTo(tbl).fadeIn(1000);
       }
     });
+  },
+  removeRow: function (ev) {
+    $(ev.currentTarget).fadeOut('fast');
+    $(`#${ev.data}`)
+      .children('td')
+      .animate({ padding: 0 })
+      .wrapInner('<div />')
+      .children()
+      .slideUp(function () { $(this).closest('tr').remove(); });
   }
 };
 
-var mealHover = {
-  context: function () {
-    $(this).slideUp(200);
-  }
-}
 // Listen for async-reply message from main process
 ipcRenderer.removeAllListeners('modal-window-reply');
 ipcRenderer.on('modal-window-reply', (event, arg) => {

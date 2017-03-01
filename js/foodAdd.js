@@ -88,18 +88,23 @@ var actions = {
 var grid = {
     addComment: function (meal, note) {
         if (note) {
-            var comment = $('#notesMeal' + meal);
-            var newComment = document.createElement('li');
-            newComment.innerHTML = note;
-            comment.show('fast');
-            comment.children('ul').append(newComment);
+            var comment = $(`#notesMeal${meal} p`);
+            //append new comment
+            comment.html(`${comment.html()}<div>${note}</div>`);
         }
     },
     addRow: function (a, b, c) { //item, meal, multiplier
-        //get table body to append a new row
-        var table = $('#tbl' + b + ' > tbody:last-child');
+        //get table body to append a new row 
+        var table = $(`#tbl${b} > tbody:last-child`);
         //create row from dropdown selection
         var row = grid.generateRow(a, c);
+
+        //set row ID based on table and row count
+        var rowId = `table_${b}_row_${table.children().length}`;
+        row.attr('id', rowId);
+        //add actions
+        row.find('.delete i').click(rowId, mealClick.removeRow);
+
         //fade in for effect
         row.hide().appendTo(table).fadeIn(1000);
 
@@ -117,19 +122,19 @@ var grid = {
         grid.updateMacro(allFat, 9, allCal, 'lblMacroFat');
         grid.updateMacro(allCarb, 4, allCal, 'lblMacroCarb');
         grid.updateMacro(allProtein, 4, allCal, 'lblMacroPro');
-        //set contxt menu
-        $(row).on('contextmenu', grid.removeRow);
+        //set contxt menu 
     },
     generateRow: function (data, multiplier) {
         var safe = isNaN(multiplier) ? 1 : multiplier;
         var row = $('<tr>').append(
             $('<td>').text(data.name),
             $('<td>').text(data.category),
-            $('<td>').text(multiplier + ' ' + data.serving),
+            $('<td>').text(`${multiplier} ${data.serving}`),
             $('<td class="cal">').text((data.calorie * safe).toFixed(1)),
             $('<td class="fat">').text((data.fat * safe).toFixed(1)),
             $('<td class="carb">').text((data.carb * safe).toFixed(1)),
-            $('<td class="pro">').text((data.protein * safe).toFixed(1))
+            $('<td class="pro">').text((data.protein * safe).toFixed(1)),
+            $('<td class="delete">').html('<i class="btn-circle-default red delete-row fa fa-times" type="button"></i>')
         );
         return row;
     },
@@ -171,22 +176,6 @@ var grid = {
         //remove class hiding meal[i]
         var tbl = $('#meal' + e);
         tbl.removeClass('meal-empty');
-    },
-    removeRow: function (e) {
-        //get context menu on meal page
-        var contextMenu = $('#contextMenu');
-        //show context menu
-        contextMenu.css({
-            position: "absolute",
-            left: e.pageX,
-            top: e.pageY,
-            display: "none"
-        }).slideDown(100);
-        //set events 
-        $('#btnRemoveFood').off('click').on('click', () => {
-            $(e.currentTarget).fadeOut(400).remove();
-            contextMenu.slideUp(100);
-        });
     }
 };
 

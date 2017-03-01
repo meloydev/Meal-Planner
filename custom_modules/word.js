@@ -3,7 +3,7 @@ const Docxtemplater = require('docxtemplater');
 const JSZip = require('jszip');
 
 exports.saveMealAsDocx = (clientData, templateLocation, saveLocation) => {
-    console.log(clientData);
+    // console.log(clientData);
     return new Promise((res, rej) => {
         //Load the docx file as a binary 
         var content = fs.readFileSync(templateLocation, "binary");
@@ -12,7 +12,7 @@ exports.saveMealAsDocx = (clientData, templateLocation, saveLocation) => {
         var doc = new Docxtemplater().loadZip(zip)
 
         //set the templateVariables 
-        doc.setData({
+        var obj = {
             name: `${clientData.client.firstName} ${clientData.client.lastName}`,
             email: clientData.client.email,
             phone: clientData.client.phone,
@@ -22,7 +22,9 @@ exports.saveMealAsDocx = (clientData, templateLocation, saveLocation) => {
             fat: clientData.mealPlan.totals.fat,
             carb: clientData.mealPlan.totals.carb,
             protein: clientData.mealPlan.totals.protein
-        });
+        }
+        console.log(obj);
+        doc.setData(obj);
 
         doc.render();
 

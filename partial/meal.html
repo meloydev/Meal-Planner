@@ -1,42 +1,7 @@
 <link href="css/meal.css" rel="stylesheet">
 <script src="./js/meal.js"></script>
-<!--print logo-->
-<img src="asset/tbf-350x350.png" alt="Logo" class="logo">
 <!--content-->
 <div class="meal-container">
-	<div class="printTitle">
-		<h3>
-			Meal plan for <strong id="lblPrintName">Name</strong><br>
-			<small><label id="lblPrintStart">start date</label> - <label id="lblPrintEnd">end date</label></small>
-		</h3>
-		<br>
-		<div class="printTotals">
-			<table>
-				<tbody>
-					<tr>
-						<td>Calories</td>
-						<td><strong id="lblPrintCal">0</strong></td>
-						<td></td>
-					</tr>
-					<tr>
-						<td>Protein</td>
-						<td><strong id="lblPrintPro">0</strong></td>
-						<td><strong id="lblPrintProMacro">0</strong></td>
-					</tr>
-					<tr>
-						<td>Fat</td>
-						<td><strong id="lblPrintFat">0</strong></td>
-						<td><strong id="lblPrintFatMacro">0</strong></td>
-					</tr>
-					<tr>
-						<td>Carbs</td>
-						<td><strong id="lblPrintCarb">0</strong></td>
-						<td><strong id="lblPrintCarbMacro">0</strong></td>
-					</tr>
-				</tbody>
-			</table>
-		</div>
-	</div>
 	<table>
 		<thead>
 			<tr>
@@ -59,8 +24,8 @@
 				</tbody>
 			</table>
 			<div id="notesMealOne" class="meal-notes">
-				<span>Notes:</span>
-				<ul></ul>
+				<span>Notes</span>
+				<p contenteditable="true"></p>
 			</div>
 		</div>
 		<div id="mealTwo" class="meal-empty">
@@ -71,8 +36,8 @@
 				</tbody>
 			</table>
 			<div id="notesMealTwo" class="meal-notes">
-				<span>Notes:</span>
-				<ul></ul>
+				<span>Notes</span>
+				<p contenteditable="true"></p>
 			</div>
 		</div>
 		<div id="mealThree" class="meal-empty">
@@ -83,8 +48,8 @@
 				</tbody>
 			</table>
 			<div id="notesMealThree" class="meal-notes">
-				<span>Notes:</span>
-				<ul></ul>
+				<span>Notes</span>
+				<p contenteditable="true"></p>
 			</div>
 		</div>
 		<div id="mealFour" class="meal-empty">
@@ -95,8 +60,8 @@
 				</tbody>
 			</table>
 			<div id="notesMealFour" class="meal-notes">
-				<span>Notes:</span>
-				<ul></ul>
+				<span>Notes</span>
+				<p contenteditable="true"></p>
 			</div>
 		</div>
 		<div id="mealFive" class="meal-empty">
@@ -107,8 +72,8 @@
 				</tbody>
 			</table>
 			<div id="notesMealFive" class="meal-notes">
-				<span>Notes:</span>
-				<ul></ul>
+				<span>Notes</span>
+				<p contenteditable="true"></p>
 			</div>
 		</div>
 		<div id="mealSix" class="meal-empty">
@@ -119,8 +84,8 @@
 				</tbody>
 			</table>
 			<div id="notesMealSix" class="meal-notes">
-				<span>Notes:</span>
-				<ul></ul>
+				<span>Notes</span>
+				<p contenteditable="true"></p>
 			</div>
 		</div>
 		<div id="mealSeven" class="meal-empty">
@@ -131,8 +96,8 @@
 				</tbody>
 			</table>
 			<div id="notesMealSeven" class="meal-notes">
-				<span>Notes:</span>
-				<ul></ul>
+				<span>Notes</span>
+				<p contenteditable="true"></p>
 			</div>
 		</div>
 		<div id="mealEight" class="meal-empty">
@@ -143,8 +108,8 @@
 				</tbody>
 			</table>
 			<div id="notesMealEight" class="meal-notes">
-				<span>Notes:</span>
-				<ul></ul>
+				<span>Notes</span>
+				<p contenteditable="true"></p>
 			</div>
 		</div>
 		<div id="mealNine" class="meal-empty">
@@ -155,8 +120,8 @@
 				</tbody>
 			</table>
 			<div id="notesMealNine" class="meal-notes">
-				<span>Notes:</span>
-				<ul></ul>
+				<span>Notes</span>
+				<p contenteditable="true"></p>
 			</div>
 		</div>
 	</div>
@@ -190,10 +155,10 @@
 <!--context menu-->
 <div id="contextMenu" class="dropdown clearfix">
 	<ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu" style="display:block;position:static;margin-bottom:5px;">
-<li><a id="btnRemoveFood" tabindex="-1" href="#">Remove</a></li>
-<li><a id="btnPlusOne" tabindex="-1" href="#">+</a></li>
-<li><a id="btnNegOne" tabindex="-1" href="#">-</a></li>
-</ul>
+		<li><a id="btnRemoveFood" tabindex="-1" href="#">Remove</a></li>
+		<li><a id="btnPlusOne" tabindex="-1" href="#">+</a></li>
+		<li><a id="btnNegOne" tabindex="-1" href="#">-</a></li>
+	</ul>
 </div>
 
 <!--actions-->
