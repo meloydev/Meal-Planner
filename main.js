@@ -7,7 +7,7 @@ const setting = require('./settings');
 const word = require('./custom_modules/word');
 const util = require('./custom_modules/util');
 
-//local pathing 
+//local pathing  
 const imgPath = `${process.env.USERPROFILE}\\Documents\\Data\\image`;
 const documentPath = `${process.env.USERPROFILE}\\Documents\\Data`;
 

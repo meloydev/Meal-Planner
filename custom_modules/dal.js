@@ -3,7 +3,7 @@ const Datastore = require('nedb');
 const dbClient = new Datastore({ filename: `${dbPath}\\client.db`, autoload: true });
 var dbSetting = new Datastore({ filename: `${dbPath}\\setting.db`, autoload: true });
 var dbFood = new Datastore({ filename: `${dbPath}\\food.db`, autoload: true });
-var dbBaseFood = new Datastore({ filename: `.\\food.db`, autoload: true });
+//var dbBaseFood = new Datastore({ filename: `${__dirname}\\food.db`, autoload: true });
 var dbMeal = new Datastore({ filename: `${dbPath}\\meal.db`, autoload: true });
 var dbImage = new Datastore({ filename: `${dbPath}\\image.db`, autoload: true });
 
@@ -143,40 +143,14 @@ exports.getSettingsPromise = (args) => {
 
 exports.getFoodByDescriptionPromise = (args) => {
     return new Promise((res, rej) => {
-        let one = new Promise((res, resj) => {
-            var re = new RegExp(args, 'i');
-            dbFood.find({ name: re }, (err, data) => {
-                if (err) {
-                    rej(err);
-                } else {
-                    res(data);
-                }
-            });
-        });
-        let two = new Promise((res, resj) => {
-            var re = new RegExp(args, 'i');
-            dbBaseFood.find({ name: re }, (err, data) => {
-                if (err) {
-                    rej(err);
-                } else {
-                    res(data);
-                }
-            });
-        });
-
-        Promise.all([one, two])
-            .then(value => {
-                let ar = [];
-                for (var i = 0; i < value.length; i++) {
-                    var element = value[i];
-                    ar = ar.concat(element);
-                }
-                res(ar);
-            })
-            .catch(err => {
+        var re = new RegExp(args, 'i');
+        dbFood.find({ name: re }, (err, data) => {
+            if (err) {
                 rej(err);
-            })
-
+            } else {
+                res(data);
+            }
+        });
     });
 }
 
@@ -207,7 +181,7 @@ exports.getFoodByIdPromise = (foodId) => {
 exports.insertFoodPromise = (foodItem) => {
     return new Promise((res, rej) => {
         foodItem.name = foodItem.name.toLowerCase();
-        dbFood.update({ name: foodItem.name }, foodItem, { upsert: true }, function (err, data) {
+        dbFood.update({ name: foodItem.name, serving: foodItem.serving }, foodItem, { upsert: true }, function (err, data) {
             if (err) {
                 rej(err);
             } else {

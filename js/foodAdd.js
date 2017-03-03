@@ -42,13 +42,11 @@ var actions = {
             grid.addRow(item, meal, multiplier);
             //remove hide class if neccessary
             grid.unhideMeal(meal);
-
             //clear form and ready  
             var mealAddForm = document.getElementById('frmFoodAdd');
             //add notes to meal   
             var customComment = $('#txtComment').val();
             grid.addComment(meal, customComment);
-
         } else {
             var messageOptions = {
                 body: 'Alert!',
@@ -82,6 +80,12 @@ var actions = {
             alert('Select a food item first');
             this.value = 1;
         }
+    },
+    showMultiplier(serving) {
+        var half = serving.indexOf('½ cup');
+        var quarter = serving.indexOf('&frac14;');
+        //if one is true it will equal -1
+        return half + quarter !== -1;
     }
 };
 
@@ -90,7 +94,7 @@ var grid = {
         if (note) {
             var comment = $(`#notesMeal${meal} p`);
             //append new comment
-            comment.html(`${comment.html()}<div>${note}</div>`);
+            comment.html(`${comment.text()} ${note}`);
         }
     },
     addRow: function (a, b, c) { //item, meal, multiplier
@@ -126,10 +130,15 @@ var grid = {
     },
     generateRow: function (data, multiplier) {
         var safe = isNaN(multiplier) ? 1 : multiplier;
+        var show = actions.showMultiplier(data.serving);
+        var quanText = `${multiplier} ${data.serving}`;
+        if (!show) {
+            quanText = data.serving;
+        }
         var row = $('<tr>').append(
             $('<td>').text(data.name),
             $('<td>').text(data.category),
-            $('<td>').text(`${multiplier} ${data.serving}`),
+            $('<td>').text(quanText),
             $('<td class="cal">').text((data.calorie * safe).toFixed(1)),
             $('<td class="fat">').text((data.fat * safe).toFixed(1)),
             $('<td class="carb">').text((data.carb * safe).toFixed(1)),
@@ -228,7 +237,8 @@ ipcRenderer.on('food-search-byId-result', (event, foodItem) => {
 ipcRenderer.on('food-search-result', (event, foodItems) => {
 
     var suggestionArray = $.map(foodItems, function (i) {
-        return { 'value': i.name, data: i._id }//map returned values for autocomplete
+
+        return { value: `${i.name} (${i.serving})`, data: i._id }//map returned values for autocomplete
     });
     //make suggestion object
     var result = {

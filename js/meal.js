@@ -15,6 +15,12 @@ var load = {
     if (client._id) {
       ipcRenderer.send('find-meal', client);
     }
+  },
+  showMultiplier(serving) {
+    var half = serving.indexOf('½ cup');
+    var quarter = serving.indexOf('&frac14;');
+    //if one is true it will equal -1
+    return half + quarter !== -1;
   }
 }
 
